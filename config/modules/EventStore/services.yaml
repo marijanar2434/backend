@@ -1,0 +1,25 @@
+services:
+
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false
+
+  # Repository
+  App\VehicleApp\EventStore\Main\Infrastructure\Persistence\Doctrine\DoctrineEventStoreRepository:
+    class: App\VehicleApp\EventStore\Main\Infrastructure\Persistence\Doctrine\DoctrineEventStoreRepository
+    arguments:
+      $registry: '@doctrine'
+      $entityClass: 'App\VehicleApp\EventStore\Main\Domain\Event\StoredDomainEvent'
+      $criteriaBuilder: '@App\VehicleApp\EventStore\Main\Infrastructure\Persistence\Doctrine\Query\DoctrineEventStoreCriteriaBuilder'
+  App\VehicleApp\EventStore\Main\Domain\Event\EventStore: '@App\VehicleApp\EventStore\Main\Infrastructure\Persistence\Doctrine\DoctrineEventStoreRepository'
+
+  App\VehicleApp\EventStore\Main\Infrastructure\Persistence\Doctrine\Query\DoctrineEventStoreCriteriaBuilder:
+    class: App\VehicleApp\EventStore\Main\Infrastructure\Persistence\Doctrine\Query\DoctrineEventStoreCriteriaBuilder
+
+  # Doctrine subscriber
+  App\VehicleApp\EventStore\Main\Infrastructure\Persistence\Doctrine\DoctrineEventSubscriber:
+    class: App\VehicleApp\EventStore\Main\Infrastructure\Persistence\Doctrine\DoctrineEventSubscriber
+    tags:
+      - { name: 'doctrine.event_subscriber', priority: 500, connection: 'default' }

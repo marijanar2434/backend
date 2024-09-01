@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\VehicleApp\Vehicle\Main\Domain\Model\UserVehicle\UserVehicle" table="vehicles_users" repository-class="App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\UserVehicle\DoctrineUserVehicleRepository">
+                  
+        <id name="id" type="uuid" column="id">
+            <generator strategy="NONE"/>
+        </id>
+        
+        <field name="fullname" type="string" column="vehicle_user_fullname"/>
+        <field name="username" type="string" column="vehicle_user_username"/>
+        <field name="email" type="string" column="vehicle_user_email"/>
+
+    
+    </entity>
+</doctrine-mapping>

@@ -1,0 +1,61 @@
+api_platform:
+    title: Vehicle app
+    description: 'Vehicle app'
+    version: 1.0.0
+    show_webby: true
+    path_segment_name_generator: api_platform.path_segment_name_generator.dash
+    oauth:
+        enabled: false
+    formats:
+        jsonld: ['application/ld+json']
+        jsonhal: ['application/hal+json']
+        jsonapi: ['application/vnd.api+json']
+        json: ['application/json']
+        xml: ['application/xml', 'text/xml']
+        yaml: ['application/x-yaml']
+        csv: ['text/csv']
+        html: ['text/html']
+    patch_formats:
+        json: ['application/merge-patch+json', 'application/json']
+        jsonapi: ['application/vnd.api+json']
+    error_formats:
+        jsonproblem: ['application/problem+json']
+        jsonld: ['application/ld+json']      # Hydra error formats
+        jsonapi: ['application/vnd.api+json']
+    mapping:
+        paths: [
+            '%kernel.project_dir%/src/VehicleApp/IdentityAccess/Main/Infrastructure/Delivery/Symfony/ApiPlatform/Model',
+            '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Delivery/Symfony/ApiPlatform/Model',
+        ]
+    swagger:
+        versions: [3]
+    defaults:
+        pagination_enabled: true
+        pagination_client_enabled: false
+        pagination_partial: false
+        pagination_client_partial: false
+        pagination_items_per_page: 10
+        pagination_client_items_per_page: false
+        pagination_maximum_items_per_page: 20
+        item_operations:
+            get:
+                method: GET
+                requirements:
+                    id: '%app.uuid.regex%'
+            put:
+                method: PUT
+                requirements:
+                    id: '%app.uuid.regex%'
+            patch:
+                method: PATCH
+                requirements:
+                    id: '%app.uuid.regex%'
+            delete:
+                method: DELETE
+                requirements:
+                    id: '%app.uuid.regex%'
+    collection:
+        pagination:
+            enabled_parameter_name: 'pagination'
+            page_parameter_name: 'page'
+            items_per_page_parameter_name: 'size'

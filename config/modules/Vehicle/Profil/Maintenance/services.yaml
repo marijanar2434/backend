@@ -1,0 +1,80 @@
+services:
+
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false
+
+
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Profil\Maintenance\DataProvider:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Profil\Maintenance\DataProvider
+    tags: [ 'api_platform.collection_data_provider', 'api_platform.item_data_provider' ]
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Profil\Maintenance\DataPersister:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Profil\Maintenance\DataPersister
+    tags: [ 'api_platform.data_persister']
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Maintenance\DoctrineMaintenanceRepository:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Maintenance\DoctrineMaintenanceRepository
+    arguments:
+      $entityClass: 'App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Maintenance\Maintenance'
+    calls:
+      - setCriteriaBuilder: ['@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Maintenance\Query\DoctrineMaintenanceCriteriaBuilder']  
+  App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Maintenance\MaintenanceRepository: '@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Maintenance\DoctrineMaintenanceRepository'
+  
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Maintenance\Query\DoctrineMaintenanceCriteriaBuilder:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Maintenance\Query\DoctrineMaintenanceCriteriaBuilder
+
+
+
+
+  #Application Service
+  App\VehicleApp\Vehicle\Main\Application\Query\Profil\Maintenance\MaintenanceCollectionQueryHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Query\Profil\Maintenance\MaintenanceCollectionQueryHandler
+    arguments:
+      $maintenanceRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Maintenance\MaintenanceRepository'
+      $collectionTransformer: '@App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Maintenance\MaintenanceCollectionTransformer'
+
+  App\VehicleApp\Vehicles\Main\Application\Command\Profil\Maintenance\CreateMaintenanceHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Profil\Maintenance\CreateMaintenanceHandler
+    arguments:
+      $maintenanceRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Maintenance\MaintenanceRepository'
+      $userVehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\UserVehicle\UserVehicleRepository'
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+      $partAndServiceRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\PartAndService\PartAndServiceRepository'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Maintenance\UpdateMaintenanceHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Profil\Maintenance\UpdateMaintenanceHandler
+    arguments:
+      $userRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\UserVehicle\UserVehicleRepository'
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+      $maintenanceRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Maintenance\MaintenanceRepository'
+
+  App\VehicleApp\Vehicle\Main\Domain\Service\Profil\Maintenance\MaintenanceDestroyer:
+    class: App\VehicleApp\Vehicle\Main\Domain\Service\Profil\Maintenance\MaintenanceDestroyer
+    arguments:
+      $maintenanceRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Maintenance\MaintenanceRepository'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Maintenance\DestroyMaintenanceHandler:
+    class:  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Maintenance\DestroyMaintenanceHandler
+    arguments:
+      $maintenanceRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Maintenance\MaintenanceRepository'
+      $maintenanceDestroyer: '@App\VehicleApp\Vehicle\Main\Domain\Service\Profil\Maintenance\MaintenanceDestroyer'
+
+  #Transformer
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Maintenance\MaintenanceItemTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Maintenance\MaintenanceItemTransformer
+  
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Maintenance\MaintenanceCollectionTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Maintenance\MaintenanceCollectionTransformer
+
+
+
+  #Fixture
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Maintenance\Fixtures\MaintenanceFixtures:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Maintenance\Fixtures\MaintenanceFixtures
+    arguments:
+      $maintenanceRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Maintenance\MaintenanceRepository'
+    tags: [ 'doctrine.fixture.orm' ]

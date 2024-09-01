@@ -1,0 +1,45 @@
+services:
+
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false
+
+
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Vehicle\CreateImage:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Vehicle\CreateImage
+  
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Vehicle\DeleteImage:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Vehicle\DeleteImage
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Image\DoctrineImageRepository:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Image\DoctrineImageRepository
+    arguments:
+      $entityClass: 'App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Image\Image'
+    calls:
+      - setCriteriaBuilder: ['@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Image\Query\DoctrineImageCriteriaBuilder']
+  App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Image\ImageRepository: '@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Image\DoctrineImageRepository'
+  
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Image\Query\DoctrineImageCriteriaBuilder:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Image\Query\DoctrineImageCriteriaBuilder
+
+
+
+  #Application Service
+  App\VehicleApp\Vehicle\Main\Application\Query\Profil\Image\ImageCollectionQueryHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Query\Profil\Image\ImageCollectionQueryHandler
+    arguments:
+      $imageRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Image\ImageRepository'
+      $collectionTransformer: '@App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Image\ImageCollectionTransformer'
+
+  
+
+
+  #Transformer
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Image\ImageItemTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Image\ImageItemTransformer
+  
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Image\ImageCollectionTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Image\ImageCollectionTransformer

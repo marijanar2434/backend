@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Registration\Registration" table="vehicles_registrations" repository-class="App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Registration\DoctrineRegistrationRepository">
+        <id name="id" type="uuid" column="id">
+            <generator strategy="NONE"/>
+        </id>
+        <field name="registrationNumber" type="string" column="vehicle_registration_number"/>
+        <field name="registrationStartDate" type="datetime_immutable" column="vehicle_registration_start_date"/>
+        <field name="registrationExpire" type="datetime_immutable" column="vehicle_registration_expire"/>
+        <field name="registrationFee" type="integer" column="vehicle_registration_fee"/>
+        <field name="timeOfUser" type="integer" column="vehicle_time_of_user"/>
+        <field name="active" type="boolean" column="vehicle_registration_active"/>
+
+
+        <field name="createdOn" type="datetime_immutable" column="created_on"/>
+        <field name="updatedOn" type="datetime_immutable" column="updated_on"/>
+
+
+        <many-to-one field="vehicle" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\Vehicle" inversed-by="registrations" />
+        <many-to-one field="userVehicle" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\UserVehicle\UserVehicle" inversed-by="registrations" />
+
+        <one-to-many field="documentations" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Registration\Documentation\RegDocumentation" mapped-by="registration"  orphan-removal="true"> 
+            <cascade>
+                    <cascade-persist/>
+                    <cascade-remove/>
+            </cascade>
+         </one-to-many>
+         
+    </entity>
+</doctrine-mapping>

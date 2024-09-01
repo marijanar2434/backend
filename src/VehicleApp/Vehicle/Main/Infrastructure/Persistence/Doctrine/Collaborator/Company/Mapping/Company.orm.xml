@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\Company\Company" table="vehicles_companies" repository-class="App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Collaborator\Company\DoctrineCompanyRepository">
+        <id name="id" type="uuid" column="id">
+            <generator strategy="NONE"/>
+        </id>
+        <field name="name" type="string" column="vehicles_name" length="255"/>
+        <field name="companyCode" type="string" column="vehicles_company_code" length="255"/>
+    </entity>
+</doctrine-mapping>

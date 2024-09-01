@@ -1,0 +1,81 @@
+services:
+
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false
+
+##TYPE
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Type\DataProvider:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Type\DataProvider
+    tags: [ 'api_platform.collection_data_provider', 'api_platform.item_data_provider' ]
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Type\DataPersister:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Type\DataPersister
+    tags: [ 'api_platform.data_persister']
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Type\DoctrineTypeRepository:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Type\DoctrineTypeRepository
+    arguments:
+      $entityClass: 'App\VehicleApp\Vehicle\Main\Domain\Model\Type\Type'
+    calls:
+      - setCriteriaBuilder: ['@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Type\Query\DoctrineTypeCriteriaBuilder']
+  App\VehicleApp\Vehicle\Main\Domain\Model\Type\TypeRepository: '@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Type\DoctrineTypeRepository'
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Type\Query\DoctrineTypeCriteriaBuilder:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Type\Query\DoctrineTypeCriteriaBuilder
+
+  #Repository   
+  App\VehicleApp\Vehicles\Main\Application\Command\Type\CreateTypeHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Type\CreateTypeHandler
+    arguments:
+      $typeRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Type\TypeRepository'
+      $typeValidator: '@App\VehicleApp\Vehicle\Main\Domain\Service\Validator\TypeValidator'
+      $brandRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Brand\BrandRepository'
+
+  App\VehicleApp\Vehicle\Main\Domain\Service\Type\TypeDestroyer:
+    class: App\VehicleApp\Vehicle\Main\Domain\Service\Type\TypeDestroyer
+    arguments:
+      $typeRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Type\TypeRepository'
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+      
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Type\DestroyTypeHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Type\DestroyTypeHandler
+    arguments:
+      $typeRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Type\TypeRepository'
+      $typeDestroyer: '@App\VehicleApp\Vehicle\Main\Domain\Service\Type\TypeDestroyer'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Type\UpdateTypeHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Type\UpdateTypeHandler
+    arguments:
+      $typeRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Type\TypeRepository'
+      $typeValidator: '@App\VehicleApp\Vehicle\Main\Domain\Service\Validator\TypeValidator'
+
+  #Transformer
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Type\TypeItemTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Type\TypeItemTransformer
+  
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Type\TypeCollectionTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Type\TypeCollectionTransformer
+
+  #Application Service
+  App\VehicleApp\Vehicle\Main\Application\Query\Type\TypeCollectionQueryHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Query\Type\TypeCollectionQueryHandler
+    arguments:
+      $typeRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Type\TypeRepository'
+      $collectionTransformer: '@App\VehicleApp\Vehicle\Main\Application\Transformer\Type\TypeCollectionTransformer'
+
+  #Validator
+  App\VehicleApp\Vehicle\Main\Domain\Service\Validator\TypeValidator: 
+    class: App\VehicleApp\Vehicle\Main\Domain\Service\Validator\TypeValidator
+    arguments:
+      $typeRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Type\TypeRepository'
+
+  #Fixture
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Type\Fixtures\TypeFixtures:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Type\Fixtures\TypeFixtures
+    arguments:
+      $typeRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Type\TypeRepository'
+    tags: [ 'doctrine.fixture.orm' ]

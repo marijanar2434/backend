@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\VehicleApp\Vehicle\Main\Domain\Model\Profil\FuelAndExpense\FuelAndExpense" table="vehicles_fuel_and_expenses" repository-class="App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\FuelAndExpense\DoctrineFuelAndExpenseRepository">
+        <id name="id" type="uuid" column="id">
+            <generator strategy="NONE"/>
+        </id>
+        <field name="date" type="datetime_immutable" column="vehicle_fae_date"/>
+        <field name="mileage" type="integer" column="vehicle_fae_mileage"/>
+        <field name="expense" type="float" column="vehicle_fae_expense" nullable="true"/>
+        <field name="price" type="float" column="vehicle_fae_price"/>
+        <field name="timeOfUser" type="integer" column="vehicle_fae_time_of_user" nullable="true"/>
+
+
+        <field name="createdOn" type="datetime_immutable" column="created_on"/>
+        <field name="updatedOn" type="datetime_immutable" column="updated_on"/>
+
+
+        <many-to-one field="user" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\UserVehicle\UserVehicle" inversed-by="fuelAndExpenses" />
+        <many-to-one field="vehicle" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\Vehicle" inversed-by="fuelAndExpenses" />
+        <many-to-one field="expenseType" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\Profil\FuelAndExpense\ExpenseType\ExpenseType" inversed-by="expenses" />
+                
+    </entity>
+</doctrine-mapping>

@@ -1,0 +1,97 @@
+services:
+
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false
+
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Profil\Registration\DataProvider:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Profil\Registration\DataProvider
+    tags: [ 'api_platform.collection_data_provider', 'api_platform.item_data_provider' ]
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Profil\Registration\DataPersister:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Profil\Registration\DataPersister
+    tags: [ 'api_platform.data_persister']
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Registration\DoctrineRegistrationRepository:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Registration\DoctrineRegistrationRepository
+    arguments:
+      $entityClass: 'App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Registration\Registration'
+    calls:
+      - setCriteriaBuilder: ['@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Registration\Query\DoctrineRegistrationCriteriaBuilder']
+  App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Registration\RegistrationRepository: '@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Registration\DoctrineRegistrationRepository'
+  
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Registration\Query\DoctrineRegistrationCriteriaBuilder:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Registration\Query\DoctrineRegistrationCriteriaBuilder
+
+
+  #Repository   
+  App\VehicleApp\Vehicles\Main\Application\Command\Profil\Registration\CreateRegistrationHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Profil\Registration\CreateRegistrationHandler
+    arguments:
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+      $registrationRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Registration\RegistrationRepository'
+      $userVehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\UserVehicle\UserVehicleRepository'
+      $registrationValidator: '@App\VehicleApp\Vehicle\Main\Domain\Service\Validator\RegistrationValidator'
+
+  App\VehicleApp\Vehicle\Main\Domain\Service\Profil\Registration\RegistrationDestroyer:
+    class: App\VehicleApp\Vehicle\Main\Domain\Service\Profil\Registration\RegistrationDestroyer
+    arguments:
+      $registrationRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Registration\RegistrationRepository'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Registration\DestroyRegistrationHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Profil\Registration\DestroyRegistrationHandler
+    arguments:
+      $registrationRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Registration\RegistrationRepository'
+      $registrationDestroyer: '@App\VehicleApp\Vehicle\Main\Domain\Service\Profil\Registration\RegistrationDestroyer'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Registration\UpdateRegistrationHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Profil\Registration\UpdateRegistrationHandler
+    arguments:
+      $registrationRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Registration\RegistrationRepository'
+      $registrationValidator: '@App\VehicleApp\Vehicle\Main\Domain\Service\Validator\RegistrationValidator'
+      $userVehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\UserVehicle\UserVehicleRepository'
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Registration\CreateRegDocumentationHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Profil\Registration\CreateRegDocumentationHandler
+    arguments:
+      $registrationRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Registration\RegistrationRepository'
+      $fileInspector: '@App\Common\Infrastructure\Service\FileInspector\UrlFileInspector'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Registration\Documentation\DestroyRegDocumentationHandler:
+    class:  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Registration\Documentation\DestroyRegDocumentationHandler
+    arguments:
+      $registrationRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Registration\RegistrationRepository'
+    
+  #Transformer
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Registration\RegistrationItemTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Registration\RegistrationItemTransformer
+  
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Registration\RegistrationCollectionTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Registration\RegistrationCollectionTransformer
+
+
+  # Application Service
+  App\VehicleApp\Vehicle\Main\Application\Query\Profil\Registration\RegistrationCollectionQueryHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Query\Profil\Registration\RegistrationCollectionQueryHandler
+    arguments:
+      $registrationRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Registration\RegistrationRepository'
+      $collectionTransformer: '@App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Registration\RegistrationCollectionTransformer'
+
+
+  #Validator
+  App\VehicleApp\Vehicle\Main\Domain\Service\Validator\RegistrationValidator: 
+    class: App\VehicleApp\Vehicle\Main\Domain\Service\Validator\RegistrationValidator
+    arguments:
+      $registrationRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Registration\RegistrationRepository'
+
+
+  #Fixture
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Registration\Fixtures\RegistrationFixtures:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Registration\Fixtures\RegistrationFixtures
+    arguments:
+      $registrationRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Registration\RegistrationRepository'
+    tags: [ 'doctrine.fixture.orm' ]

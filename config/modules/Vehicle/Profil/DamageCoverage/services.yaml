@@ -1,0 +1,81 @@
+services:
+
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false
+
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Profil\DamageCoverage\DataProvider:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Profil\DamageCoverage\DataProvider
+    tags: [ 'api_platform.collection_data_provider', 'api_platform.item_data_provider' ]
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Profil\DamageCoverage\DataPersister:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Profil\DamageCoverage\DataPersister
+    tags: [ 'api_platform.data_persister']
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\DamageCoverage\DoctrineDamageCoverageRepository:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\DamageCoverage\DoctrineDamageCoverageRepository
+    arguments:
+      $entityClass: 'App\VehicleApp\Vehicle\Main\Domain\Model\Profil\DamageCoverage\DamageCoverage'
+    calls:
+      - setCriteriaBuilder: ['@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\DamageCoverage\Query\DoctrineDamageCoverageCriteriaBuilder']  
+  App\VehicleApp\Vehicle\Main\Domain\Model\Profil\DamageCoverage\DamageCoverageRepository: '@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\DamageCoverage\DoctrineDamageCoverageRepository'
+  
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\DamageCoverage\Query\DoctrineDamageCoverageCriteriaBuilder:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\DamageCoverage\Query\DoctrineDamageCoverageCriteriaBuilder
+
+
+
+  #Transformer
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\DamageCoverage\DamageCoverageItemTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\DamageCoverage\DamageCoverageItemTransformer
+  
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\DamageCoverage\DamageCoverageCollectionTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\DamageCoverage\DamageCoverageCollectionTransformer
+
+
+  #Application Service
+  App\VehicleApp\Vehicle\Main\Application\Query\Profil\DamageCoverage\DamageCoverageCollectionQueryHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Query\Profil\DamageCoverage\DamageCoverageCollectionQueryHandler
+    arguments:
+      $damageCoverageRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\DamageCoverage\DamageCoverageRepository'
+      $collectionTransformer: '@App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\DamageCoverage\DamageCoverageCollectionTransformer'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\DamageCoverage\CreateDamageCoverageHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Profil\DamageCoverage\CreateDamageCoverageHandler
+    arguments:
+      $damageCoverageRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\DamageCoverage\DamageCoverageRepository'
+  
+  App\VehicleApp\Vehicle\Main\Domain\Service\Profil\DamageCoverage\DamageCoverageDestroyer:
+    class: App\VehicleApp\Vehicle\Main\Domain\Service\Profil\DamageCoverage\DamageCoverageDestroyer
+    arguments:
+      $damageCoverageRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\DamageCoverage\DamageCoverageRepository'
+      $damageRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Damage\DamageRepository'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\DamageCoverage\DestroyDamageCoverageHandler:
+    class:  App\VehicleApp\Vehicle\Main\Application\Command\Profil\DamageCoverage\DestroyDamageCoverageHandler
+    arguments:
+      $damageCoverageRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\DamageCoverage\DamageCoverageRepository'
+      $damageCoverageDestroyer: '@App\VehicleApp\Vehicle\Main\Domain\Service\Profil\DamageCoverage\DamageCoverageDestroyer'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\DamageCoverage\UpdateDamageCoverageHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Profil\DamageCoverage\UpdateDamageCoverageHandler
+    arguments:
+      $damageCoverageRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\DamageCoverage\DamageCoverageRepository'
+
+
+  #Validator
+  App\VehicleApp\Vehicle\Main\Domain\Service\Validator\DamageCoverageValidator:
+    class:  App\VehicleApp\Vehicle\Main\Domain\Service\Validator\DamageCoverageValidator
+    arguments:
+      $damageCoverageRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\DamageCoverage\DamageCoverageRepository'
+      
+
+  #Fixture
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\DamageCoverage\Fixtures\DamageCoverageFixtures:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\DamageCoverage\Fixtures\DamageCoverageFixtures
+    arguments:
+      $damageCoverageRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\DamageCoverage\DamageCoverageRepository'
+    tags: [ 'doctrine.fixture.orm' ]

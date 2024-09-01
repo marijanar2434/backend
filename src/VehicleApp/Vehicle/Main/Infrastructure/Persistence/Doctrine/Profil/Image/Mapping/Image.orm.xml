@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Image\Image" table="vehicles_images" repository-class="App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Image\DoctrineImageRepository">
+        <id name="id" type="uuid" column="id">
+            <generator strategy="NONE"/>
+        </id>
+      
+        <embedded name="image" class="App\Common\Domain\ValueObject\File"/>
+    
+
+
+        <many-to-one field="vehicle" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\Vehicle" mapped-by="images"/>
+
+    </entity>
+</doctrine-mapping>

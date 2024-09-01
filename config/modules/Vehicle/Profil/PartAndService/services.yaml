@@ -1,0 +1,79 @@
+services:
+
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false
+
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Profil\PartAndService\DataProvider:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Profil\PartAndService\DataProvider
+    tags: [ 'api_platform.collection_data_provider', 'api_platform.item_data_provider' ]
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Profil\PartAndService\DataPersister:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Profil\PartAndService\DataPersister
+    tags: [ 'api_platform.data_persister']
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\PartAndService\DoctrinePartAndServiceRepository:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\PartAndService\DoctrinePartAndServiceRepository
+    arguments:
+      $entityClass: 'App\VehicleApp\Vehicle\Main\Domain\Model\Profil\PartAndService\PartAndService'
+    calls:
+      - setCriteriaBuilder: ['@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\PartAndService\Query\DoctrinePartAndServiceCriteriaBuilder']  
+  App\VehicleApp\Vehicle\Main\Domain\Model\Profil\PartAndService\PartAndServiceRepository: '@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\PartAndService\DoctrinePartAndServiceRepository'
+  
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\PartAndService\Query\DoctrinePartAndServiceCriteriaBuilder:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\PartAndService\Query\DoctrinePartAndServiceCriteriaBuilder
+
+
+
+  #Transformer
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\PartAndService\\PartAndServiceItemTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\PartAndService\PartAndServiceItemTransformer
+  
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\PartAndService\PartAndServiceCollectionTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\PartAndService\PartAndServiceCollectionTransformer
+
+  #Application Service
+  App\VehicleApp\Vehicle\Main\Application\Query\Profil\PartAndService\PartAndServiceCollectionQueryHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Query\Profil\PartAndService\PartAndServiceCollectionQueryHandler
+    arguments:
+      $partAndServiceRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\PartAndService\PartAndServiceRepository'
+      $collectionTransformer: '@App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\PartAndService\PartAndServiceCollectionTransformer'
+  
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\PartAndService\CreatePartAndServiceHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Profil\PartAndService\CreatePartAndServiceHandler
+    arguments:
+      $partAndServiceRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\PartAndService\PartAndServiceRepository'
+
+  App\VehicleApp\Vehicle\Main\Domain\Service\Profil\PartAndService\PartAndServiceDestroyer:
+    class: App\VehicleApp\Vehicle\Main\Domain\Service\Profil\PartAndService\PartAndServiceDestroyer
+    arguments:
+      $partAndServiceRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\PartAndService\PartAndServiceRepository'
+      $maintenanceRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Maintenance\MaintenanceRepository'
+      $damageRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Damage\DamageRepository'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\PartAndService\DestroyPartAndServiceHandler:
+    class:  App\VehicleApp\Vehicle\Main\Application\Command\Profil\PartAndService\DestroyPartAndServiceHandler
+    arguments:
+      $partAndServiceRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\PartAndService\PartAndServiceRepository'
+      $partAndServiceDestroyer: '@App\VehicleApp\Vehicle\Main\Domain\Service\Profil\PartAndService\PartAndServiceDestroyer'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\PartAndService\UpdatePartAndServiceHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Profil\PartAndService\UpdatePartAndServiceHandler
+    arguments:
+      $partAndServiceRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\PartAndService\PartAndServiceRepository'
+
+  #Validator
+  App\VehicleApp\Vehicle\Main\Domain\Service\Validator\PartAndServiceValidator:
+    class:  App\VehicleApp\Vehicle\Main\Domain\Service\Validator\PartAndServiceValidator
+    arguments:
+      $partAndServiceRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\PartAndService\PartAndServiceRepository'
+  
+  #Fixture
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\PartAndService\Fixtures\PartAndServiceFixtures:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\PartAndService\Fixtures\PartAndServiceFixtures
+    arguments:
+      $partAndServiceRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\PartAndService\PartAndServiceRepository'
+    tags: [ 'doctrine.fixture.orm' ]

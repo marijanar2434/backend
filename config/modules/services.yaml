@@ -1,0 +1,159 @@
+services:
+
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false
+
+  # Bus
+  App\Common\Infrastructure\Application\Bus\SymfonyQueryBus:
+    class: App\Common\Infrastructure\Application\Bus\SymfonyQueryBus
+    arguments:
+      $messageBus: '@query.bus'
+  App\Common\Application\Bus\QueryBus: '@App\Common\Infrastructure\Application\Bus\SymfonyQueryBus'
+
+  App\Common\Infrastructure\Application\Bus\SymfonyCommandBus:
+    class: App\Common\Infrastructure\Application\Bus\SymfonyCommandBus
+    arguments:
+      $messageBus: '@command.bus'
+  App\Common\Application\Bus\CommandBus: '@App\Common\Infrastructure\Application\Bus\SymfonyCommandBus'
+
+  App\Common\Infrastructure\Application\Bus\SymfonyEventBus:
+    class: App\Common\Infrastructure\Application\Bus\SymfonyEventBus
+    arguments:
+      $messageBus: '@event.bus'
+  App\Common\Application\Bus\EventBus: '@App\Common\Infrastructure\Application\Bus\SymfonyEventBus'
+
+  App\Common\Infrastructure\Application\Exception\ApplicationServiceExceptionHandler:
+    class: App\Common\Infrastructure\Application\Exception\ApplicationServiceExceptionHandler
+
+  # Bus Middleware
+  App\Common\Infrastructure\Delivery\Symfony\Bus\Middleware\DoctrineTransactionMiddleware:
+    class: App\Common\Infrastructure\Delivery\Symfony\Bus\Middleware\DoctrineTransactionMiddleware
+
+  App\Common\Infrastructure\Delivery\Symfony\Bus\Middleware\HandleExceptionMiddleware:
+    class: App\Common\Infrastructure\Delivery\Symfony\Bus\Middleware\HandleExceptionMiddleware
+    arguments:
+      $exceptionHandler: '@App\Common\Infrastructure\Application\Exception\ApplicationServiceExceptionHandler'
+
+  App\Common\Infrastructure\Delivery\Symfony\Bus\Middleware\AuthorizationMiddleware:
+    class: App\Common\Infrastructure\Delivery\Symfony\Bus\Middleware\AuthorizationMiddleware
+
+  App\Common\Infrastructure\Delivery\Symfony\Bus\Middleware\PublishDomainEventsAfterCurrentBusMiddleware:
+    class: App\Common\Infrastructure\Delivery\Symfony\Bus\Middleware\PublishDomainEventsAfterCurrentBusMiddleware
+    arguments:
+      $eventStore: '@App\VehicleApp\EventStore\Main\Domain\Event\EventStore'
+
+  # Server Configuration
+  App\Common\Infrastructure\Service\ServerConfiguration\ServerConfiguration:
+    class: App\Common\Infrastructure\Service\ServerConfiguration\ServerConfiguration
+
+  # Console Event
+  App\Common\Infrastructure\Delivery\Symfony\EventListener\OnCommandListener:
+    class: App\Common\Infrastructure\Delivery\Symfony\EventListener\OnCommandListener
+    arguments:
+      $authenticatorManager: '@security.authenticator.manager.api'
+      $userProvider: '@App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\Security\SecurityUserProvider'
+      $authenticator: '@App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\Security\OAuth2Authenticator'
+      $serverConfiguration: '@App\Common\Infrastructure\Service\ServerConfiguration\ServerConfiguration'
+    tags: [ 'kernel.event_listener' ]
+
+  # Worker Event
+  App\Common\Infrastructure\Delivery\Symfony\EventListener\WorkerMessageReceivedListener: 
+    class: App\Common\Infrastructure\Delivery\Symfony\EventListener\WorkerMessageReceivedListener
+    arguments:
+      $authenticatorManager: '@security.authenticator.manager.api'
+      $userProvider: '@App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\Security\SecurityUserProvider'
+      $authenticator: '@App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\Security\OAuth2Authenticator'
+      $serverConfiguration: '@App\Common\Infrastructure\Service\ServerConfiguration\ServerConfiguration'
+    tags: [ 'kernel.event_listener' ]
+
+  # Repository
+  Doctrine\Persistence\ManagerRegistry: '@doctrine'
+
+  # Hasher
+  App\Common\Infrastructure\Service\Hasher\BcryptHasher:
+    class: App\Common\Infrastructure\Service\Hasher\BcryptHasher
+  App\Common\Infrastructure\Service\Hasher\Hasher: '@App\Common\Infrastructure\Service\Hasher\BcryptHasher'
+
+  # Slugger
+  App\Common\Infrastructure\Service\Slugger\SymfonySlugger:
+    class: App\Common\Infrastructure\Service\Slugger\SymfonySlugger
+  App\Common\Infrastructure\Service\Slugger\Slugger: '@App\Common\Infrastructure\Service\Slugger\SymfonySlugger'
+
+  # Filesystem
+  league.flysystem.visibility:
+    class: League\Flysystem\UnixVisibility\PortableVisibilityConverter
+    arguments:
+      $defaultForDirectories: 'public'
+
+  league.flysystem.adapter.local:
+    class: League\Flysystem\Local\LocalFilesystemAdapter
+    arguments:
+      $location: '%kernel.project_dir%/public/upload'
+      $visibility: '@league.flysystem.visibility'
+    public: false
+
+  league.flysystem.local:
+    class: League\Flysystem\Filesystem
+    arguments:
+      $adapter: '@league.flysystem.adapter.local'
+
+  League\Flysystem\Filesystem: '@league.flysystem.local'
+
+  app.common.infrastructure.service.fileUploader.flySystemLocalFileUploader:
+    class: App\Common\Infrastructure\Service\FileUploader\FlySystemFileUploader
+    arguments:
+      $filesystem: '@league.flysystem.local'
+      $location: '%kernel.project_dir%/public/upload'
+  App\Common\Infrastructure\Service\FileUploader\FileUploader: '@app.common.infrastructure.service.fileUploader.flySystemLocalFileUploader'
+
+  aws.s3.client:
+    class: Aws\S3\S3Client
+    arguments:
+       - { credentials: {key: '%env(APP_AWS_ACCESS_KEY_ID)%', secret: '%env(APP_AWS_SECRET_ACCESS_KEY)%'}, region: '%env(APP_AWS_REGION)%', version: '%env(APP_AWS_VERSION)%', scheme: '%env(APP_AWS_SCHEME)%', endpoint: '%env(APP_AWS_ENDPOINT)%', use_path_style_endpoint: '%env(bool:APP_AWS_USE_PATH_STYLE_ENDPOINT)%' }  
+
+  league.flysystem.adapter.aws.s3:
+    class: League\Flysystem\AwsS3V3\AwsS3V3Adapter
+    arguments:
+      $client: '@aws.s3.client'
+      $bucket: '%env(APP_AWS_BUCKET_NAME)%'
+    public: false
+
+  league.flysystem.s3:
+    class: League\Flysystem\Filesystem
+    arguments:
+      $adapter: '@league.flysystem.adapter.aws.s3'
+
+  app.common.infrastructure.service.fileUploader.flySystemAwsS3FileUploader:
+    class: App\Common\Infrastructure\Service\FileUploader\FlySystemFileUploader
+    arguments:
+      $filesystem: '@league.flysystem.s3'
+      $location: '%env(APP_AWS_BUCKET)%'
+
+  # File Destroyer
+  app.common.infrastructure.service.fileDestroyer.flySystemLocalFileDestroyer:
+    class: App\Common\Infrastructure\Service\FileDestroyer\FlySystemFileDestroyer
+  App\Common\Infrastructure\Service\FileDestroyer\FileDestroyer: '@app.common.infrastructure.service.fileDestroyer.flySystemLocalFileDestroyer'
+
+  # File Inspector
+  App\Common\Infrastructure\Service\FileInspector\UrlFileInspector:
+    class: App\Common\Infrastructure\Service\FileInspector\UrlFileInspector
+  App\Common\Infrastructure\Service\FileInspector\CachingUrlFileInspector:
+    class: App\Common\Infrastructure\Service\FileInspector\CachingUrlFileInspector
+    decorates: App\Common\Infrastructure\Service\FileInspector\UrlFileInspector
+    arguments: [ '@.inner' ]
+  App\Common\Infrastructure\Service\FileInspector\LocalFileInspector:
+    class: App\Common\Infrastructure\Service\FileInspector\LocalFileInspector
+  App\Common\Infrastructure\Service\FileInspector\FileInspector: '@App\Common\Infrastructure\Service\FileInspector\LocalFileInspector'
+
+  # Validator
+  App\Common\Infrastructure\Delivery\Symfony\Validator\ImageRemoteUrlValidator:
+    class: App\Common\Infrastructure\Delivery\Symfony\Validator\ImageRemoteUrlValidator
+
+  # Api Platform
+  App\Common\Infrastructure\Delivery\Symfony\HttpFoundation\RequestFileMover:
+    class: App\Common\Infrastructure\Delivery\Symfony\HttpFoundation\RequestFileMover
+    arguments:
+      $serverConfiguration: '@App\Common\Infrastructure\Service\ServerConfiguration\ServerConfiguration'

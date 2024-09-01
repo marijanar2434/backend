@@ -1,0 +1,176 @@
+doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+                url: '%env(resolve:DATABASE_URL)%'
+                driver: 'pdo_mysql'
+                server_version: 'mariadb-10.7.1'
+                charset: 'utf8mb4'
+                unix_socket: '/var/run/mysqld/mysqld.sock'
+        types:
+            uuid: App\Common\Infrastructure\Persistence\Doctrine\Types\Id
+    orm:
+        default_entity_manager: default
+        auto_generate_proxy_classes: true
+        entity_managers:
+            default:
+                connection: default
+                naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+                auto_mapping: true
+                mappings:
+                    CommonFile:
+                        type: xml
+                        dir: '%kernel.project_dir%/src/Common/Infrastructure/Persistence/Doctrine/Mapping'
+                        is_bundle: false
+                        prefix: App\Common\Domain\ValueObject
+                    EventStore:
+                        type: xml
+                        dir: '%kernel.project_dir%/src/VehicleApp/EventStore/Main/Infrastructure/Persistence/Doctrine/Mapping'
+                        is_bundle: false
+                        prefix: App\VehicleApp\EventStore\Main\Domain\Event
+                    IdentityAccessUser:
+                        type: xml
+                        dir: '%kernel.project_dir%/src/VehicleApp/IdentityAccess/Main/Infrastructure/Persistence/Doctrine/Identity/Mapping'
+                        is_bundle: false
+                        prefix: App\VehicleApp\IdentityAccess\Main\Domain\Model\Identity
+                    IdentityAccessAuth:
+                        type: xml
+                        dir: '%kernel.project_dir%/src/VehicleApp/IdentityAccess/Main/Infrastructure/Persistence/Doctrine/Auth/Mapping'
+                        is_bundle: false
+                        prefix: App\VehicleApp\IdentityAccess\Main\Domain\Model\Auth
+                    IdentityAccessAccess:
+                        type: xml
+                        dir: '%kernel.project_dir%/src/VehicleApp/IdentityAccess/Main/Infrastructure/Persistence/Doctrine/Access/Mapping'
+                        is_bundle: false
+                        prefix: App\VehicleApp\IdentityAccess\Main\Domain\Model\Access
+                    VehicleBrand:
+                        type: xml
+                        dir: '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Persistence/Doctrine/Brand/Mapping'
+                        is_bundle: false 
+                        prefix: App\VehicleApp\Vehicle\Main\Domain\Model\Brand
+                    VehicleType:
+                        type: xml
+                        dir: '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Persistence/Doctrine/Type/Mapping'
+                        is_bundle: false 
+                        prefix: App\VehicleApp\Vehicle\Main\Domain\Model\Type
+                    VehicleVehicle:
+                        type: xml
+                        dir: '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Persistence/Doctrine/Profil/Vehicle/Mapping'
+                        is_bundle: false 
+                        prefix: App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle
+                    VehicleRegistration:
+                        type: xml
+                        dir: '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Persistence/Doctrine/Profil/Registration/Mapping'
+                        is_bundle: false 
+                        prefix: App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Registration
+                    VehicleColor:
+                        type: xml
+                        dir: '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Persistence/Doctrine/Profil/Color/Mapping'
+                        is_bundle: false 
+                        prefix: App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Color
+                    UserVehicle:
+                        type: xml
+                        dir: '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Persistence/Doctrine/Profil/UserVehicle/Mapping'
+                        is_bundle: false 
+                        prefix: App\VehicleApp\Vehicle\Main\Domain\Model\UserVehicle
+                    FuelAndExpense:
+                        type: xml
+                        dir: '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Persistence/Doctrine/Profil/FuelAndExpense/Mapping'
+                        is_bundle: false 
+                        prefix: App\VehicleApp\Vehicle\Main\Domain\Model\Profil\FuelAndExpense
+                    ExpenseType:
+                        type: xml
+                        dir: '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Persistence/Doctrine/Profil/FuelAndExpense/ExpenseType/Mapping'
+                        is_bundle: false 
+                        prefix: App\VehicleApp\Vehicle\Main\Domain\Model\Profil\FuelAndExpense\ExpenseType
+                    MaintenanceType:
+                        type: xml 
+                        dir: '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Persistence/Doctrine/Profil/Maintenance/MaintenanceType/Mapping'
+                        is_bundle: false 
+                        prefix: App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Maintenance\MaintenanceType
+                    Maintenance:
+                        type: xml 
+                        dir: '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Persistence/Doctrine/Profil/Maintenance/Mapping'
+                        is_bundle: false 
+                        prefix: App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Maintenance
+                    PartAndService:
+                        type: xml 
+                        dir: '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Persistence/Doctrine/Profil/PartAndService/Mapping'
+                        is_bundle: false 
+                        prefix: App\VehicleApp\Vehicle\Main\Domain\Model\Profil\PartAndService
+                    DamageCoverage:
+                        type: xml 
+                        dir: '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Persistence/Doctrine/Profil/DamageCoverage/Mapping'
+                        is_bundle: false 
+                        prefix: App\VehicleApp\Vehicle\Main\Domain\Model\Profil\DamageCoverage
+                    Damage:
+                        type: xml 
+                        dir: '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Persistence/Doctrine/Profil/Damage/Mapping'
+                        is_bundle: false 
+                        prefix: App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Damage
+                    CollabType:
+                        type: xml 
+                        dir: '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Persistence/Doctrine/Collaborator/CollabType/Mapping'
+                        is_bundle: false 
+                        prefix: App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\CollabType
+                    Client:
+                        type: xml 
+                        dir: '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Persistence/Doctrine/Collaborator/Client/Mapping'
+                        is_bundle: false 
+                        prefix: App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\Client
+                    Company:
+                        type: xml 
+                        dir: '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Persistence/Doctrine/Collaborator/Company/Mapping'
+                        is_bundle: false 
+                        prefix: App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\Company
+                    Collaborator:
+                        type: xml 
+                        dir: '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Persistence/Doctrine/Collaborator/Mapping'
+                        is_bundle: false 
+                        prefix: App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator
+                    Image:
+                        type: xml 
+                        dir: '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Persistence/Doctrine/Profil/Image/Mapping'
+                        is_bundle: false 
+                        prefix: App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Image
+                    VehicleDocumentation:
+                        type: xml 
+                        dir: '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Persistence/Doctrine/Profil/Vehicle/Documentation/Mapping'
+                        is_bundle: false 
+                        prefix: App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\Documentation
+                    RegDocumentation:
+                        type: xml 
+                        dir: '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Persistence/Doctrine/Profil/Registration/Documentation/Mapping'
+                        is_bundle: false 
+                        prefix: App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Registration\Documentation
+                    Change:
+                        type: xml
+                        dir: '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Persistence/Doctrine/Profil/HistoryOfChange/Change/Mapping'
+                        is_bundle: false 
+                        prefix: App\VehicleApp\Vehicle\Main\Domain\Model\HistoryOfChange\Change
+                    HistoryOfChange:
+                        type: xml
+                        dir: '%kernel.project_dir%/src/VehicleApp/Vehicle/Main/Infrastructure/Persistence/Doctrine/Profil/HistoryOfChange/Mapping'
+                        is_bundle: false 
+                        prefix: App\VehicleApp\Vehicle\Main\Domain\Model\HistoryOfChange
+                       
+when@prod:
+when@prod:
+    doctrine:
+        orm:
+            auto_generate_proxy_classes: false
+            query_cache_driver:
+                type: pool
+                pool: doctrine.system_cache_pool
+            result_cache_driver:
+                type: pool
+                pool: doctrine.result_cache_pool
+
+    framework:
+        cache:
+            pools:
+                doctrine.result_cache_pool:
+                    adapter: cache.app
+                doctrine.system_cache_pool:
+                    adapter: cache.system

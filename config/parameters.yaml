@@ -1,0 +1,4 @@
+parameters:
+  app.resources.common: '%kernel.project_dir%/src/Common'
+  app.resources.identity_access: '%kernel.project_dir%/src/VehicleApp/IdentityAccess'
+  app.uuid.regex: '\A[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}\z'

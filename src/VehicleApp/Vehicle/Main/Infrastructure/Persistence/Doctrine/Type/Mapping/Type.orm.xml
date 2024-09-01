@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\VehicleApp\Vehicle\Main\Domain\Model\Type\Type" table="vehicles_types" repository-class="App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Type\DoctrineTypeRepository">
+        <id name="id" type="uuid" column="id">                                                                                   
+            <generator strategy="NONE"/>
+        </id>
+        <field name="name" type="string" column="name" length="250"/>
+        <field name="createdOn" type="datetime_immutable" column="created_on"/>
+        <field name="updatedOn" type="datetime_immutable" column="updated_on"/>
+
+        <many-to-one field="brand" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\Brand\Brand" inversed-by="types" />
+
+    </entity>
+</doctrine-mapping>

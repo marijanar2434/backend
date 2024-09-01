@@ -1,0 +1,87 @@
+services:
+
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false
+
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Profil\Color\DataProvider:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Profil\Color\DataProvider
+    tags: [ 'api_platform.collection_data_provider', 'api_platform.item_data_provider' ]
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Profil\Color\DataPersister:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Profil\Color\DataPersister
+    tags: [ 'api_platform.data_persister']
+
+
+
+
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Color\DoctrineColorRepository:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Color\DoctrineColorRepository
+    arguments:
+      $entityClass: 'App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Color\Color'
+    calls:
+      - setCriteriaBuilder: ['@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Color\Query\DoctrineColorCriteriaBuilder']
+
+  App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Color\ColorRepository: '@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Color\DoctrineColorRepository'
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Color\Query\DoctrineColorCriteriaBuilder:
+    class:  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Color\Query\DoctrineColorCriteriaBuilder
+
+  #Repository
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Color\CreateColordHandler:
+    class:  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Color\CreateColorHandler
+    arguments:
+      $colorRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Color\ColorRepository'
+      $colorValidator: '@App\VehicleApp\Vehicle\Main\Domain\Service\Validator\ColorValidator' 
+
+  App\VehicleApp\Vehicle\Main\Domain\Service\Profil\Color\ColorDestroyer:
+    class:  App\VehicleApp\Vehicle\Main\Domain\Service\Profil\Color\ColorDestroyer
+    arguments:
+      $colorRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Color\ColorRepository'
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Color\DestroyColorHandler:
+    class:  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Color\DestroyColorHandler
+    arguments:
+      $colorRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Color\ColorRepository'
+      $colorDestroyer: '@App\VehicleApp\Vehicle\Main\Domain\Service\Profil\Color\ColorDestroyer'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Color\UpdateColorHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Profil\Color\UpdateColorHandler
+    arguments:
+      $colorRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Color\ColorRepository'
+      $colorValidator: '@App\VehicleApp\Vehicle\Main\Domain\Service\Validator\ColorValidator' 
+    
+  #Transformer
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Color\ColorItemTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Color\ColorItemTransformer
+  
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Color\ColorCollectionTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Color\ColorCollectionTransformer
+
+  #Application Service
+  App\VehicleApp\Vehicle\Main\Application\Query\Profil\Color\ColorCollectionQueryHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Query\Profil\Color\ColorCollectionQueryHandler
+    arguments:
+      $colorRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Color\ColorRepository'
+      $collectionTransformer: '@App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Color\ColorCollectionTransformer'
+
+
+  #Validator
+  App\VehicleApp\Vehicle\Main\Domain\Service\Validator\ColorValidator:
+    class: App\VehicleApp\Vehicle\Main\Domain\Service\Validator\ColorValidator
+    arguments:
+      $colorRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Color\ColorRepository'
+
+  #Fixture
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Color\Fixtures\ColorFixtures:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Color\Fixtures\ColorFixtures
+    arguments:
+      $colorRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Color\ColorRepository'
+    tags: ['doctrine.fixture.orm']
+
+  

@@ -1,0 +1,84 @@
+services:
+
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Brand\DataProvider:
+      class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Brand\DataProvider
+      tags: [ 'api_platform.collection_data_provider', 'api_platform.item_data_provider' ]
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Brand\DataPersister:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Brand\DataPersister
+    tags: [ 'api_platform.data_persister']
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Brand\DoctrineBrandRepository:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Brand\DoctrineBrandRepository
+    arguments:
+      $entityClass: 'App\VehicleApp\Vehicle\Main\Domain\Model\Brand\Brand'
+    calls:
+      - setCriteriaBuilder: ['@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Brand\Query\DoctrineBrandCriteriaBuilder']
+  App\VehicleApp\Vehicle\Main\Domain\Model\Brand\BrandRepository: '@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Brand\DoctrineBrandRepository'
+  
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Brand\Query\DoctrineBrandCriteriaBuilder:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Brand\Query\DoctrineBrandCriteriaBuilder
+
+
+#Repository
+  App\VehicleApp\Vehicle\Main\Application\Command\Brand\CreateBrandHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Brand\CreateBrandHandler
+    arguments:
+      $brandRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Brand\BrandRepository'
+      $brandValidator: '@App\VehicleApp\Vehicle\Main\Domain\Service\Validator\BrandValidator'  
+
+  App\VehicleApp\Vehicle\Main\Domain\Service\Brand\BrandDestroyer:
+    class: App\VehicleApp\Vehicle\Main\Domain\Service\Brand\BrandDestroyer
+    arguments:
+      $brandRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Brand\BrandRepository'
+      $typeRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Type\TypeRepository'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Brand\DestroyBrandHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Brand\DestroyBrandHandler
+    arguments:
+      $brandRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Brand\BrandRepository'
+      $brandDestroyer: '@App\VehicleApp\Vehicle\Main\Domain\Service\Brand\BrandDestroyer'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Brand\UpdateBrandHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Brand\UpdateBrandHandler
+    arguments:
+      $brandRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Brand\BrandRepository'
+      $brandValidator: '@App\VehicleApp\Vehicle\Main\Domain\Service\Validator\BrandValidator'
+
+  #Transformer
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Brand\BrandItemTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Brand\BrandItemTransformer
+  
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Brand\BrandCollectionTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Brand\BrandCollectionTransformer
+
+
+  # Application Service
+  App\VehicleApp\Vehicle\Main\Application\Query\Brand\BrandCollectionQueryHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Query\Brand\BrandCollectionQueryHandler
+    arguments:
+      $brandRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Brand\BrandRepository'
+      $collectionTransformer: '@App\VehicleApp\Vehicle\Main\Application\Transformer\Brand\BrandCollectionTransformer'
+
+
+  #Validator
+  App\VehicleApp\Vehicle\Main\Domain\Service\Validator\BrandValidator:
+    class: App\VehicleApp\Vehicle\Main\Domain\Service\Validator\BrandValidator
+    arguments:
+      $brandRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Brand\BrandRepository'
+
+  #Fixture
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Brand\Fixtures\BrandFixtures:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Brand\Fixtures\BrandFixtures
+    arguments:
+      $brandRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Brand\BrandRepository'
+    tags: [ 'doctrine.fixture.orm' ]
+
+  
+

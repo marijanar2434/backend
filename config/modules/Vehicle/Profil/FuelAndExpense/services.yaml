@@ -1,0 +1,81 @@
+services:
+
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false
+
+
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Profil\FuelAndExpense\DataProvider:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Profil\FuelAndExpense\DataProvider
+    tags: [ 'api_platform.collection_data_provider', 'api_platform.item_data_provider' ]
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Profil\FuelAndExpense\DataPersister:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Profil\FuelAndExpense\DataPersister
+    tags: [ 'api_platform.data_persister']
+    
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\FuelAndExpense\DoctrineFuelAndExpenseRepository:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\FuelAndExpense\DoctrineFuelAndExpenseRepository
+    arguments:
+      $entityClass: 'App\VehicleApp\Vehicle\Main\Domain\Model\Profil\FuelAndExpense\FuelAndExpense'
+    calls:
+      - setCriteriaBuilder: ['@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\FuelAndExpense\Query\DoctrineFuelAndExpenseCriteriaBuilder']
+  App\VehicleApp\Vehicle\Main\Domain\Model\Profil\FuelAndExpense\FuelAndExpenseRepository: '@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\FuelAndExpense\DoctrineFuelAndExpenseRepository'
+  
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\FuelAndExpense\Query\DoctrineFuelAndExpenseCriteriaBuilder:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\FuelAndExpense\Query\DoctrineFuelAndExpenseCriteriaBuilder
+
+
+  #Repository   
+  App\VehicleApp\Vehicles\Main\Application\Command\Profil\FuelAndExpense\CreateFuelAndExpenseHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Profil\FuelAndExpense\CreateFuelAndExpenseHandler
+    arguments:
+      $fuelAndExpenseRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\FuelAndExpense\FuelAndExpenseRepository'
+      $userVehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\UserVehicle\UserVehicleRepository'
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+
+  #Transformer
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\FuelAndExpense\FuelAndExpenseItemTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\FuelAndExpense\FuelAndExpenseItemTransformer
+  
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\FuelAndExpense\FuelAndExpenseCollectionTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\FuelAndExpense\FuelAndExpenseCollectionTransformer
+
+
+  #Application Service
+  App\VehicleApp\Vehicle\Main\Application\Query\Profil\FuelAndExpense\FuelAndExpenseCollectionQueryHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Query\Profil\FuelAndExpense\FuelAndExpenseCollectionQueryHandler
+    arguments:
+      $fuelAndExpenseRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\FuelAndExpense\FuelAndExpenseRepository'
+      $collectionTransformer: '@App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\FuelAndExpense\FuelAndExpenseCollectionTransformer'
+
+  App\VehicleApp\Vehicle\Main\Domain\Service\Profil\FuelAndExpense\FuelAndExpenseDestroyer:
+    class: App\VehicleApp\Vehicle\Main\Domain\Service\Profil\FuelAndExpense\FuelAndExpenseDestroyer
+    arguments:
+      $fuelAndExpenseRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\FuelAndExpense\FuelAndExpenseRepository'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\FuelAndExpense\DestroyFuelAndExpenseHandler:
+    class:  App\VehicleApp\Vehicle\Main\Application\Command\Profil\FuelAndExpense\DestroyFuelAndExpenseHandler
+    arguments:
+      $fuelAndExpenseRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\FuelAndExpense\FuelAndExpenseRepository'
+      $fuelAndExpenseDestroyer: '@App\VehicleApp\Vehicle\Main\Domain\Service\Profil\FuelAndExpense\FuelAndExpenseDestroyer'
+
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\FuelAndExpense\UpdateFuelAndExpenseHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Profil\FuelAndExpense\UpdateFuelAndExpenseHandler
+    arguments:
+      $userRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\UserVehicle\UserVehicleRepository'
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+      $fuelAndExpenseRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\FuelAndExpense\FuelAndExpenseRepository'
+
+     
+
+
+  #Fixture
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\FuelAndExpense\Fixtures\FuelAndExpenseFixtures:
+    class:  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\FuelAndExpense\Fixtures\FuelAndExpenseFixtures
+    arguments:
+      $fuelAndExpenseRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\FuelAndExpense\FuelAndExpenseRepository'
+    tags: [ 'doctrine.fixture.orm' ]

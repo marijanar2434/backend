@@ -1,0 +1,77 @@
+services:
+
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false
+
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Collaborator\Client\DataProvider:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Collaborator\Client\DataProvider
+    tags: [ 'api_platform.collection_data_provider', 'api_platform.item_data_provider' ]
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Collaborator\Client\DataPersister:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Collaborator\Client\DataPersister
+    tags: [ 'api_platform.data_persister']
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Collaborator\Client\DoctrineClientRepository:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Collaborator\Client\DoctrineClientRepository
+    arguments:
+      $entityClass: 'App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\Client\Client'
+    calls:
+      - setCriteriaBuilder: ['@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Collaborator\Client\Query\DoctrineClientCriteriaBuilder']  
+  App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\Client\ClientRepository: '@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Collaborator\Client\DoctrineClientRepository'
+  
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Collaborator\Client\Query\DoctrineClientCriteriaBuilder:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Collaborator\Client\Query\DoctrineClientCriteriaBuilder
+
+  #Transformer
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Collaborator\Client\ClientItemTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Collaborator\Client\ClientItemTransformer
+  
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Collaborator\Client\ClientCollectionTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Collaborator\Client\ClientCollectionTransformer
+
+
+  #Application Service
+  App\VehicleApp\Vehicle\Main\Application\Query\Collaborator\Client\ClientCollectionQueryHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Query\Collaborator\Client\ClientCollectionQueryHandler
+    arguments:
+      $clientRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\Client\ClientRepository'
+      $collectionTransformer: '@App\VehicleApp\Vehicle\Main\Application\Transformer\Collaborator\Client\ClientCollectionTransformer'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Collaborator\Client\CreateClientHandler:
+    class:  App\VehicleApp\Vehicle\Main\Application\Command\Collaborator\Client\CreateClientHandler
+    arguments:
+      $clientRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\Client\ClientRepository'
+  
+  App\VehicleApp\Vehicle\Main\Application\Command\Collaborator\Client\UpdateClientHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Collaborator\Client\UpdateClientHandler
+    arguments:
+      $clientRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\Client\ClientRepository'
+
+  App\VehicleApp\Vehicle\Main\Domain\Service\Collaborator\Client\ClientDestroyer:
+    class:  App\VehicleApp\Vehicle\Main\Domain\Service\Collaborator\Client\ClientDestroyer
+    arguments:
+      $clientRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\Client\ClientRepository'
+      $collaboratorRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\CollaboratorRepository'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Collaborator\Client\DestroyClientHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Collaborator\Client\DestroyClientHandler
+    arguments:
+      $clientRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\Client\ClientRepository'
+      $clientDestroyer: '@App\VehicleApp\Vehicle\Main\Domain\Service\Collaborator\Client\ClientDestroyer'
+
+  #Validator
+  App\VehicleApp\Vehicle\Main\Domain\Service\Validator\ClientValidator:
+    class: App\VehicleApp\Vehicle\Main\Domain\Service\Validator\ClientValidator
+    arguments:
+      $clientRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\Client\ClientRepository'
+
+  #Fixture
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Collaborator\Client\Fixtures\ClientFixtures:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Collaborator\Client\Fixtures\ClientFixtures
+    arguments:
+      $clientRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\Client\ClientRepository'
+    tags: [ 'doctrine.fixture.orm' ]

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\VehicleApp\IdentityAccess\Main\Domain\Model\Access\Role" table="identity_access_roles" repository-class="App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Access\DoctrineRoleRepository">
+        <id name="id" type="uuid" column="id">
+            <generator strategy="NONE"/>
+        </id>
+        <field name="name" type="string" column="name" length="250"/>
+        <field name="identifier" type="string" column="identifier" length="255"/>
+        <field name="active" type="boolean" column="active"/>
+        <field name="createdOn" type="datetime_immutable" column="created_on"/>
+        <field name="updatedOn" type="datetime_immutable" column="updated_on"/>
+
+        <many-to-many field="users" mapped-by="roles" target-entity="App\VehicleApp\IdentityAccess\Main\Domain\Model\Identity\User" fetch="EXTRA_LAZY"/>
+    </entity>
+</doctrine-mapping>

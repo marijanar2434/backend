@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\VehicleApp\IdentityAccess\Main\Domain\Model\Auth\Client" table="identity_access_clients" repository-class="App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Auth\DoctrineClientRepository">
+        <id name="id" type="uuid" column="id">
+            <generator strategy="NONE"/>
+        </id>
+        <field name="name" type="string" column="name" length="255"/>
+        <field name="secret" type="string" column="secret" length="255"/>
+        <field name="redirectUri" type="string" column="redirect_uri" length="255" nullable="true"/>
+        <field name="active" type="boolean" column="active"/>
+        <field name="confidential" type="boolean" column="confidential"/>
+        <field name="usedForGeneralPurposeAuthentication" type="boolean" column="used_for_general_purpose_authentication"/>
+        <field name="createdOn" type="datetime_immutable" column="created_on"/>
+        <field name="updatedOn" type="datetime_immutable" column="updated_on"/>
+    </entity>
+</doctrine-mapping>

@@ -1,0 +1,85 @@
+services:
+
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false
+
+
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Collaborator\DataProvider:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Collaborator\DataProvider
+    tags: [ 'api_platform.collection_data_provider', 'api_platform.item_data_provider' ]
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Collaborator\DataPersister:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Collaborator\DataPersister
+    tags: [ 'api_platform.data_persister']
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Collaborator\DoctrineCollaboratorRepository:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Collaborator\DoctrineCollaboratorRepository
+    arguments:
+      $entityClass: 'App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\Collaborator'
+    calls:
+      - setCriteriaBuilder: ['@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Collaborator\Query\DoctrineCollaboratorCriteriaBuilder']  
+  App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\CollaboratorRepository: '@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Collaborator\DoctrineCollaboratorRepository'
+  
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Collaborator\Query\DoctrineCollaboratorCriteriaBuilder:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Collaborator\Query\DoctrineCollaboratorCriteriaBuilder
+
+
+  #Transformer
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Collaborator\CollaboratorItemTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Collaborator\CollaboratorItemTransformer
+  
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Collaborator\CollaboratorCollectionTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Collaborator\CollaboratorCollectionTransformer
+
+
+  #Application Service
+  App\VehicleApp\Vehicle\Main\Application\Query\Collaborator\CollaboratorCollectionQueryHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Query\Collaborator\CollaboratorCollectionQueryHandler
+    arguments:
+      $collaboratorRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\CollaboratorRepository'
+      $collectionTransformer: '@App\VehicleApp\Vehicle\Main\Application\Transformer\Collaborator\CollaboratorCollectionTransformer'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Collaborator\CreateCollaboratorHandler:
+    class:  App\VehicleApp\Vehicle\Main\Application\Command\Collaborator\CreateCollaboratorHandler
+    arguments:
+      $collaboratorRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\CollaboratorRepository'
+      $clientRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\Client\ClientRepository'
+      $companyRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\Company\CompanyRepository'
+      $collabTypeRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\CollabType\CollabTypeRepository'
+
+
+  App\VehicleApp\Vehicle\Main\Domain\Service\Collaborator\Collaborator\CollaboratorDestroyer:
+    class:  App\VehicleApp\Vehicle\Main\Domain\Service\Collaborator\Collaborator\CollaboratorDestroyer
+    arguments:
+      $collaboratorRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\CollaboratorRepository'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Collaborator\DestroyCollaboratorHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Collaborator\DestroyCollaboratorHandler
+    arguments:
+      $collaboratorRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\CollaboratorRepository'
+      $collaboratorDestroyer: '@App\VehicleApp\Vehicle\Main\Domain\Service\Collaborator\Collaborator\CollaboratorDestroyer'
+  
+  App\VehicleApp\Vehicle\Main\Application\Command\Collaborator\UpdateCollaboratorHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Collaborator\UpdateCollaboratorHandler
+    arguments:
+      $collaboratorRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\CollaboratorRepository'
+      $clientRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\Client\ClientRepository'
+      $companyRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\Company\CompanyRepository'
+
+    #Validator
+  App\VehicleApp\Vehicle\Main\Domain\Service\Validator\CollaboratorValidator:
+    class: App\VehicleApp\Vehicle\Main\Domain\Service\Validator\CollaboratorValidator
+    arguments:
+      $collaboratorRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\CollaboratorRepository'
+
+
+  #Fixture
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Collaborator\Fixtures\CollaboratorFixtures:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Collaborator\Fixtures\CollaboratorFixtures
+    arguments:
+      $collaboratorRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\CollaboratorRepository'
+    tags: [ 'doctrine.fixture.orm' ]

@@ -1,0 +1,102 @@
+version: '3'
+
+services:
+# ---------------------------------------------------------------------------- #
+#                                 web                                          #
+# ---------------------------------------------------------------------------- #
+    web:
+        container_name: web
+        image: mikroe/nginx:latest
+        volumes:
+            - .docker/web/nginx.conf:/etc/nginx/nginx.conf
+            - .docker/web/templates:/etc/nginx/templates
+        ports:
+            - "80:80"
+            - "443:443"
+        restart: unless-stopped
+        networks:
+            default:
+                aliases:
+                    - bucket.dev-vehicle.com
+# ---------------------------------------------------------------------------- #
+#                                 backend                                      #
+# ---------------------------------------------------------------------------- #
+    backend:
+        container_name: backend
+        image: dev-vehicle/backend
+        build:
+            context: .
+            dockerfile: Dockerfile.backend
+            target: backend
+        volumes:
+            - .docker/backend/php.ini:/usr/local/etc/php/php.ini
+            - .:/var/www/html
+        restart: unless-stopped
+# ---------------------------------------------------------------------------- #
+#                                 database                                     #
+# ---------------------------------------------------------------------------- #
+    database:
+        container_name: database
+        image: mikroe/mariadb:latest
+        volumes:
+            - .docker/database/data:/var/lib/mysql
+            - .docker/database/share:/var/www/html
+            - .docker/database/my.cnf:/etc/mysql/my.cnf
+            - .docker/database/mariadb.cnf:/etc/mysql/mariadb.cnf
+            - .docker/database/mariadb.conf.d:/etc/mysql/mariadb.conf.d
+        ports:
+            - "3306:3306"
+        restart: unless-stopped
+        secrets:
+          - database_root_password
+        environment:
+            - MYSQL_ROOT_HOST=%
+            - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/database_root_password
+            - MYSQL_DATABASE=vehicle-app
+# ---------------------------------------------------------------------------- #
+#                                 message-broker                               #
+# ---------------------------------------------------------------------------- #
+    message-broker:
+        container_name: message-broker
+        image: mikroe/rabbitmq:latest
+        restart: unless-stopped
+        volumes:
+            - .docker/message-broker/rabbitmq-env.conf:/etc/rabbitmq/rabbitmq-env.conf
+# ---------------------------------------------------------------------------- #
+#                                 adminer                                      #
+# ---------------------------------------------------------------------------- #
+    adminer:
+        container_name: adminer
+        image: adminer:latest
+        volumes:
+            - .docker/adminer/adminer.css:/var/www/html/adminer.css
+        restart: unless-stopped
+# ---------------------------------------------------------------------------- #
+#                                 mailcatcher                                  #
+# ---------------------------------------------------------------------------- #
+    mailcatcher:
+        container_name: mailcatcher
+        image: mikroe/mailcatcher:latest
+        restart: unless-stopped
+# ---------------------------------------------------------------------------- #
+#                                 bucket                                       #
+# ---------------------------------------------------------------------------- #
+    bucket:
+        container_name: bucket
+        image: mikroe/localstack:latest
+        volumes:
+            - .docker/bucket:/tmp/localstack
+            - /var/run/docker.sock:/var/run/docker.sock
+        restart: unless-stopped
+        environment:
+            - SERVICES=s3
+            - DATA_DIR=/tmp/localstack/data
+            - DOCKER_HOST=unix:///var/run/docker.sock
+            - HOST_TMP_FOLDER=.docker/bucket
+            - DEBUG=1
+# ---------------------------------------------------------------------------- #
+#                                 secrets                                      #
+# ---------------------------------------------------------------------------- #
+secrets:
+    database_root_password:
+        file: .docker/database/secret/root_password.txt

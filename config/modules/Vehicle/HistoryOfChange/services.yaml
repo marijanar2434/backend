@@ -1,0 +1,47 @@
+services:
+
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false
+
+
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\HistoryOfChange\DataProvider:
+      class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\HistoryOfChange\DataProvider
+      tags: [ 'api_platform.collection_data_provider', 'api_platform.item_data_provider' ]
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\HistoryOfChange\DoctrineHistoryOfChangeRepository:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\HistoryOfChange\DoctrineHistoryOfChangeRepository
+    arguments:
+      $entityClass: 'App\VehicleApp\Vehicle\Main\Domain\Model\HistoryOfChange\HistoryOfChange'
+    calls:
+      - setCriteriaBuilder: ['@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\HistoryOfChange\Query\DoctrineHistoryOfChangeCriteriaBuilder']
+  
+  App\VehicleApp\Vehicle\Main\Domain\Model\HistoryOfChange\HistoryOfChangeRepository: '@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\HistoryOfChange\DoctrineHistoryOfChangeRepository'
+  
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\HistoryOfChange\Query\DoctrineHistoryOfChangeCriteriaBuilder:
+    class:  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\HistoryOfChange\Query\DoctrineHistoryOfChangeCriteriaBuilder
+
+
+  #Transformer
+  App\VehicleApp\Vehicle\Main\Application\Transformer\HistoryOfChange\HistoryOfChangeItemTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\HistoryOfChange\HistoryOfChangeItemTransformer
+  
+  App\VehicleApp\Vehicle\Main\Application\Transformer\HistoryOfChange\HistoryOfChangeCollectionTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\HistoryOfChange\HistoryOfChangeCollectionTransformer
+
+
+  # Application Service
+  App\VehicleApp\Vehicle\Main\Application\Query\HistoryOfChange\HistoryOfChangeCollectionQueryHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Query\HistoryOfChange\HistoryOfChangeCollectionQueryHandler
+    arguments:
+      $historyOfChangeRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\HistoryOfChange\HistoryOfChangeRepository'
+      $collectionTransformer: '@App\VehicleApp\Vehicle\Main\Application\Transformer\HistoryOfChange\HistoryOfChangeCollectionTransformer'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\HistoryOfChange\AddChangeLogHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\HistoryOfChange\AddChangeLogHandler
+    arguments:
+      $historyOfChangeRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\HistoryOfChange\HistoryOfChangeRepository'
+      $userVehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\UserVehicle\UserVehicleRepository'

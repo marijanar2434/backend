@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Registration\Documentation\RegDocumentation" table="registration_documentations" repository-class="App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Registration\Documentation\DoctrineRegDocumentationRepository">
+        <id name="id" type="uuid" column="id">
+            <generator strategy="NONE"/>
+        </id>
+      
+        <embedded name="file" class="App\Common\Domain\ValueObject\File"/>
+
+        <many-to-one field="registration" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Registration\Registration" mapped-by="documentations"/>
+
+    </entity>
+</doctrine-mapping>

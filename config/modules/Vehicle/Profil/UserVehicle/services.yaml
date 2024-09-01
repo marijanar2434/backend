@@ -1,0 +1,58 @@
+services:
+
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false
+
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Profil\UserVehicle\DataProvider:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Profil\UserVehicle\DataProvider
+    tags: [ 'api_platform.collection_data_provider', 'api_platform.item_data_provider' ]
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\UserVehicle\DoctrineUserVehicleRepository:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\UserVehicle\DoctrineUserVehicleRepository
+    arguments:
+      $entityClass: 'App\VehicleApp\Vehicle\Main\Domain\Model\UserVehicle\UserVehicle'
+    calls:
+      - setCriteriaBuilder: ['@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\UserVehicle\Query\DoctrineUserVehicleCriteriaBuilder']
+  App\VehicleApp\Vehicle\Main\Domain\Model\UserVehicle\UserVehicleRepository: '@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\UserVehicle\DoctrineUserVehicleRepository'
+  
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\UserVehicle\Query\DoctrineUserVehicleCriteriaBuilder:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\UserVehicle\Query\DoctrineUserVehicleCriteriaBuilder
+  
+  
+  #Transformer
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\UserVehicle\UserVehicleItemTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\UserVehicle\UserVehicleItemTransformer
+  
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\UserVehicle\UserVehicleCollectionTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\UserVehicle\UserVehicleCollectionTransformer
+
+
+  # Application Service
+  App\VehicleApp\Vehicle\Main\Application\Query\Profil\UserVehicle\UserVehicleCollectionQueryHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Query\Profil\UserVehicle\UserVehicleCollectionQueryHandler
+    arguments:
+      $userVehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\UserVehicle\UserVehicleRepository'
+      $collectionTransformer: '@App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\UserVehicle\UserVehicleCollectionTransformer'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\UserVehicle\CreateUserVehicleHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\UserVehicle\CreateUserVehicleHandler
+    arguments:
+      $userVehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\UserVehicle\UserVehicleRepository'
+
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\MessageListener\UserVehicle\UserVehicleMessageListener:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\MessageListener\UserVehicle\UserVehicleMessageListener
+    tags: [ 'messenger.message_handler' ]
+
+
+
+  #Fixture
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\UserVehicle\Fixtures\UserVehicleFixtures:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\UserVehicle\Fixtures\UserVehicleFixtures
+    arguments:
+      $userVehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\UserVehicle\UserVehicleRepository'
+    tags: [ 'doctrine.fixture.orm' ]

@@ -1,0 +1,64 @@
+framework:
+    messenger:
+        # The bus that is going to be injected when injecting MessageBusInterface
+        default_bus: event.bus
+        buses:
+            command.bus:
+                middleware:
+                    # each time a message is handled, the Doctrine connection
+                    # is "pinged" and reconnected if it's closed. Useful
+                    # if your workers run for a long time and the database
+                    # connection is sometimes lost
+                    - doctrine_ping_connection
+                    # After handling, the Doctrine connection is closed,
+                    # which can free up database connections in a worker,
+                    # instead of keeping them open forever
+                    - doctrine_close_connection
+                    # Custom middleware to catch errors and transform them
+                    - App\Common\Infrastructure\Delivery\Symfony\Bus\Middleware\HandleExceptionMiddleware
+                    # Custom middleware to check user permissions
+                    # - App\Common\Infrastructure\Delivery\Symfony\Bus\Middleware\AuthorizationMiddleware
+                    # Validates command before dispatch
+                    - validation
+                    # Custom middleware to publish domain events after transaction
+                    - App\Common\Infrastructure\Delivery\Symfony\Bus\Middleware\PublishDomainEventsAfterCurrentBusMiddleware
+                    # Using dispatch_after_current_bus middleware before the DoctrineTransactionMiddleware
+                    # means sub-dispatched messages with a DispatchAfterCurrentBus stamp would be
+                    # handled after the Doctrine transaction has been committed.
+                    - dispatch_after_current_bus
+                    # Wraps all handlers in a single doctrine transaction.
+                    - App\Common\Infrastructure\Delivery\Symfony\Bus\Middleware\DoctrineTransactionMiddleware
+            query.bus:
+                middleware:
+                    # Custom middleware to catch errors and transform them
+                    - App\Common\Infrastructure\Delivery\Symfony\Bus\Middleware\HandleExceptionMiddleware
+                    # Custom middleware to check user permissions
+                    # - App\Common\Infrastructure\Delivery\Symfony\Bus\Middleware\AuthorizationMiddleware
+                    # Validates command before dispatch
+                    - validation
+            event.bus:
+                # the 'allow_no_handlers' middleware allows to have no handler
+                # configured for this bus without throwing an exception
+                default_middleware: allow_no_handlers
+                middleware:
+                    # Validates command before dispatch
+                    - validation
+        # Uncomment this (and the failed transport below) to send failed messages to this transport for later handling.
+        failure_transport: failed
+        transports:
+            # default transport
+            async:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                retry_strategy:
+                    max_retries: 1
+                    # milliseconds delay
+                    delay: 1000
+                    # causes the delay to be higher before each retry
+                    # e.g. 1 second delay, 2 seconds, 4 seconds
+                    multiplier: 2
+                    max_delay: 0
+            failed: 'doctrine://default?queue_name=failed'
+            sync: 'sync://'
+        routing:
+            App\VehicleApp\IdentityAccess\Main\Application\Command\Identity\SendPasswordResetEmailToUserCommand: async
+            App\VehicleApp\Vehicle\Main\Application\Command\UserVehicle\CreateUserVehicleCommand: async

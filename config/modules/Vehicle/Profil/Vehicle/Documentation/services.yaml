@@ -1,0 +1,25 @@
+services:
+
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false
+
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Vehicle\CreateVehicleDocumentation:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Vehicle\CreateVehicleDocumentation
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Vehicle\DeleteDocumentation:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Vehicle\DeleteDocumentation
+
+  # App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Vehicle\Documentation\DoctrineVehicleDocumentationRepository:
+  #   class:  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Vehicle\Documentation\DoctrineVehicleDocumentationRepository
+  #   arguments:
+  #     $entityClass: 'App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\Documentation\VehicleDocumentation'
+  #   calls:
+  #     - setCriteriaBuilder: ['@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Vehicle\Documentation\Query\DoctrineVehicleDocumentationCriteriaBuilder']
+  # App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Documentation\DocumentationRepository: '@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Vehicle\Documentation\DoctrineVehicleDocumentationRepository'
+  
+  # App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Vehicle\Documentation\Query\DoctrineVehicleDocumentationCriteriaBuilder:
+  #   class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Vehicle\Documentation\Query\DoctrineVehicleDocumentationCriteriaBuilder

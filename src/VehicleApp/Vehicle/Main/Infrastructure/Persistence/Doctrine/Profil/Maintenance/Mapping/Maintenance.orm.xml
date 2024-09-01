@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Maintenance\Maintenance" table="vehicles_maintenances" repository-class="App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Maintenance\DoctrineMaintenanceRepository">
+        <id name="id" type="uuid" column="id">
+            <generator strategy="NONE"/>
+        </id>
+
+        <field name="date" type="datetime_immutable" column="vehicle_maintenance_date"/>
+        <field name="mileage" type="integer" column="vehicle_maintenance_mileage"/>
+        <field name="fee" type="float" column="vehicle_maintenance_fee"/>
+        <field name="timeOfUser" type="integer" column="vehicle_maintenance_time_of_user" nullable="true"/>
+
+
+        <field name="createdOn" type="datetime_immutable" column="created_on"/>
+        <field name="updatedOn" type="datetime_immutable" column="updated_on"/>
+
+
+        <many-to-one field="user" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\UserVehicle\UserVehicle" inversed-by="maintenances" />
+        <many-to-one field="type" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Maintenance\MaintenanceType\MaintenanceType" inversed-by="maintenances" />
+        <many-to-one field="vehicle" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\Vehicle" inversed-by="maintenances" />
+    
+    
+    
+       <many-to-many field="partAndServices" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\Profil\PartAndService\PartAndService" inversed-by="maintenances" fetch="EXTRA_LAZY">
+            <join-table name="vehicles_maintenance_parts">
+                <join-columns>
+                    <join-column name="maintenance_id" referenced-column-name="id"/>
+                </join-columns>
+                <inverse-join-columns>
+                    <join-column name="part_and_service_id" referenced-column-name="id"/>
+                </inverse-join-columns>
+            </join-table>
+        </many-to-many>
+
+
+
+    </entity>
+</doctrine-mapping>

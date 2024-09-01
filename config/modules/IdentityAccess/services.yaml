@@ -1,0 +1,349 @@
+services:
+
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false
+
+  # Api Platform
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\User\DataProvider:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\User\DataProvider
+    tags: [ 'api_platform.collection_data_provider', 'api_platform.item_data_provider' ]
+
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\User\DataPersister:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\User\DataPersister
+    tags: [ 'api_platform.data_persister']
+
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\User\UploadAvatar:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\User\UploadAvatar
+
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\User\AttachRole:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\User\AttachRole
+
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\User\DetachRole:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\User\DetachRole
+
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Role\DataProvider:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Role\DataProvider
+    tags: [ 'api_platform.collection_data_provider', 'api_platform.item_data_provider' ]
+
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Role\DataPersister:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Role\DataPersister
+    tags: [ 'api_platform.data_persister']
+
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Auth\AccessToken:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Auth\AccessToken
+
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Auth\Me:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Auth\Me
+
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Auth\RequestPasswordReset:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Auth\RequestPasswordReset
+
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Auth\PasswordReset:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Auth\PasswordReset
+
+  # OAuth2 Server
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Domain\Service\Auth\OAuth2\:
+    namespace: App\VehicleApp\IdentityAccess\Main\Infrastructure\Domain\Service\Auth\OAuth2\
+    resource: '%app.resources.identity_access%/Main/Infrastructure/Domain/Service/Auth/OAuth2'
+
+  identityAccess.league.oauth2.server.privateCryptKey:
+    class: League\OAuth2\Server\CryptKey
+    arguments:
+      $keyPath: '%env(OAUTH2_PRIVATE_KEY)%'
+      $passPhrase: null
+      $keyPermissionsCheck: false
+
+  identityAccess.league.oauth2.server.publicCryptKey:
+    class: League\OAuth2\Server\CryptKey
+    arguments:
+      $keyPath: '%env(OAUTH2_PUBLIC_KEY)%'
+      $passPhrase: null
+      $keyPermissionsCheck: false
+
+  identityAccess.league.oauth2.server.grant.passwordGrant:
+    class: League\OAuth2\Server\Grant\PasswordGrant
+    arguments:
+      $userRepository: '@App\VehicleApp\IdentityAccess\Main\Infrastructure\Domain\Service\Auth\OAuth2\Repository\UserRepository'
+      $refreshTokenRepository: '@App\VehicleApp\IdentityAccess\Main\Infrastructure\Domain\Service\Auth\OAuth2\Repository\RefreshTokenRepository'
+
+  identityAccess.league.oauth2.server.grant.refreshTokenGrant:
+    class: League\OAuth2\Server\Grant\RefreshTokenGrant
+    arguments:
+      $refreshTokenRepository: '@App\VehicleApp\IdentityAccess\Main\Infrastructure\Domain\Service\Auth\OAuth2\Repository\RefreshTokenRepository'
+
+  identityAccess.league.oauth2.server.grant.accessTokenTtl:
+    class: \DateInterval
+    arguments: [ 'PT10H' ]
+
+  League\OAuth2\Server\AuthorizationServer:
+    class: League\OAuth2\Server\AuthorizationServer
+    arguments:
+      $clientRepository: '@App\VehicleApp\IdentityAccess\Main\Infrastructure\Domain\Service\Auth\OAuth2\Repository\ClientRepository'
+      $accessTokenRepository: '@App\VehicleApp\IdentityAccess\Main\Infrastructure\Domain\Service\Auth\OAuth2\Repository\AccessTokenRepository'
+      $scopeRepository: '@App\VehicleApp\IdentityAccess\Main\Infrastructure\Domain\Service\Auth\OAuth2\Repository\ScopeRepository'
+      $privateKey: '@identityAccess.league.oauth2.server.privateCryptKey'
+      $encryptionKey: '%env(OAUTH2_ENCRYPTION_KEY)%'
+    calls:
+      - enableGrantType: [ '@identityAccess.league.oauth2.server.grant.passwordGrant', '@identityAccess.league.oauth2.server.grant.accessTokenTtl' ]
+      - enableGrantType: [ '@identityAccess.league.oauth2.server.grant.refreshTokenGrant' ]
+
+  League\OAuth2\Server\ResourceServer:
+    class: League\OAuth2\Server\ResourceServer
+    arguments:
+      $accessTokenRepository: '@App\VehicleApp\IdentityAccess\Main\Infrastructure\Domain\Service\Auth\OAuth2\Repository\AccessTokenRepository'
+      $publicKey: '@identityAccess.league.oauth2.server.publicCryptKey'
+
+  # Security
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\Security\SecurityUserProvider:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\Security\SecurityUserProvider
+    arguments:
+      $userRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Identity\UserRepository'
+
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\Security\OAuth2Authenticator:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Delivery\Symfony\Security\OAuth2Authenticator
+
+  # Repository
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Identity\DoctrineUserRepository:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Identity\DoctrineUserRepository
+    arguments:
+      $entityClass: 'App\VehicleApp\IdentityAccess\Main\Domain\Model\Identity\User'
+    calls:
+      - setCriteriaBuilder: ['@App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Identity\Query\DoctrineUserCriteriaBuilder']
+  App\VehicleApp\IdentityAccess\Main\Domain\Model\Identity\UserRepository: '@App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Identity\DoctrineUserRepository'
+
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Identity\Query\DoctrineUserCriteriaBuilder:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Identity\Query\DoctrineUserCriteriaBuilder
+
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Auth\DoctrineClientRepository:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Auth\DoctrineClientRepository
+    arguments:
+      $entityClass: 'App\VehicleApp\IdentityAccess\Main\Domain\Model\Auth\Client'
+  App\VehicleApp\IdentityAccess\Main\Domain\Model\Auth\ClientRepository: '@App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Auth\DoctrineClientRepository'
+
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Auth\DoctrineAccessTokenRepository:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Auth\DoctrineAccessTokenRepository
+    arguments:
+      $entityClass: 'App\VehicleApp\IdentityAccess\Main\Domain\Model\Auth\AccessToken'
+  App\VehicleApp\IdentityAccess\Main\Domain\Model\Auth\AccessTokenRepository: '@App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Auth\DoctrineAccessTokenRepository'
+
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Auth\Query\DoctrineAccessTokenCriteriaBuilder:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Auth\Query\DoctrineAccessTokenCriteriaBuilder
+
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Auth\DoctrineRefreshTokenRepository:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Auth\DoctrineRefreshTokenRepository
+    arguments:
+      $entityClass: 'App\VehicleApp\IdentityAccess\Main\Domain\Model\Auth\RefreshToken'
+  App\VehicleApp\IdentityAccess\Main\Domain\Model\Auth\RefreshTokenRepository: '@App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Auth\DoctrineRefreshTokenRepository'
+
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Auth\Query\DoctrineRefreshTokenCriteriaBuilder:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Auth\Query\DoctrineRefreshTokenCriteriaBuilder
+
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Access\DoctrineRoleRepository:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Access\DoctrineRoleRepository
+    arguments:
+      $entityClass: 'App\VehicleApp\IdentityAccess\Main\Domain\Model\Access\Role'
+    calls:
+      - setCriteriaBuilder: ['@App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Access\Query\DoctrineRoleCriteriaBuilder']
+  App\VehicleApp\IdentityAccess\Main\Domain\Model\Access\RoleRepository: '@App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Access\DoctrineRoleRepository'
+
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Access\Query\DoctrineRoleCriteriaBuilder:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Access\Query\DoctrineRoleCriteriaBuilder
+
+  # Transformer
+  App\VehicleApp\IdentityAccess\Main\Application\Transformer\Identity\UserItemTransformer:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Transformer\Identity\UserItemTransformer
+
+  App\VehicleApp\IdentityAccess\Main\Application\Transformer\Identity\UserCollectionTransformer:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Transformer\Identity\UserCollectionTransformer
+
+  App\VehicleApp\IdentityAccess\Main\Application\Transformer\Identity\UserAvatarItemTransformer:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Transformer\Identity\UserAvatarItemTransformer
+
+  App\VehicleApp\IdentityAccess\Main\Application\Transformer\Auth\AuthenticationItemTransformer:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Transformer\Auth\AuthenticationItemTransformer
+
+  App\VehicleApp\IdentityAccess\Main\Application\Transformer\Access\RoleItemTransformer:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Transformer\Access\RoleItemTransformer
+
+  App\VehicleApp\IdentityAccess\Main\Application\Transformer\Access\RoleCollectionTransformer:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Transformer\Access\RoleCollectionTransformer
+
+  # Domain Service
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Domain\Service\Auth\OAuth2\OAuth2AuthenticationStrategy:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Domain\Service\Auth\OAuth2\OAuth2AuthenticationStrategy
+  App\VehicleApp\IdentityAccess\Main\Domain\Service\Auth\Authentication:
+    class: App\VehicleApp\IdentityAccess\Main\Domain\Service\Auth\Authentication
+    arguments:
+      $strategy: '@App\VehicleApp\IdentityAccess\Main\Infrastructure\Domain\Service\Auth\OAuth2\OAuth2AuthenticationStrategy'
+      $eventStore: '@App\VehicleApp\EventStore\Main\Domain\Event\EventStore'
+
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Domain\Service\Access\SymfonyVoterAuthorizationStrategy:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Domain\Service\Access\SymfonyVoterAuthorizationStrategy
+    arguments:
+      $authorizationChecker: '@security.authorization_checker'
+  App\VehicleApp\IdentityAccess\Main\Domain\Service\Access\Authorization:
+    class: App\VehicleApp\IdentityAccess\Main\Domain\Service\Access\Authorization
+    arguments:
+      $strategy: '@App\VehicleApp\IdentityAccess\Main\Infrastructure\Domain\Service\Access\SymfonyVoterAuthorizationStrategy'
+      $eventStore: '@App\VehicleApp\EventStore\Main\Domain\Event\EventStore'
+
+  App\VehicleApp\IdentityAccess\Main\Domain\Service\Identity\UserValidator:
+    class: App\VehicleApp\IdentityAccess\Main\Domain\Service\Identity\UserValidator
+    arguments:
+      $userRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Identity\UserRepository'
+
+  App\VehicleApp\IdentityAccess\Main\Domain\Service\Access\RoleValidator:
+    class: App\VehicleApp\IdentityAccess\Main\Domain\Service\Access\RoleValidator
+    arguments:
+      $roleRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Access\RoleRepository'
+
+  App\VehicleApp\IdentityAccess\Main\Domain\Service\Identity\UserDestroyer:
+    class: App\VehicleApp\IdentityAccess\Main\Domain\Service\Identity\UserDestroyer
+    arguments:
+      $userRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Identity\UserRepository'
+
+  App\VehicleApp\IdentityAccess\Main\Domain\Service\Access\RoleDestroyer:
+    class: App\VehicleApp\IdentityAccess\Main\Domain\Service\Access\RoleDestroyer
+    arguments:
+      $userRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Identity\UserRepository'
+      $roleRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Access\RoleRepository'
+
+  # Application Service
+  App\VehicleApp\IdentityAccess\Main\Application\Command\Auth\AuthenticateUserHandler:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Command\Auth\AuthenticateUserHandler
+    arguments:
+      $authentication: '@App\VehicleApp\IdentityAccess\Main\Domain\Service\Auth\Authentication'
+      $itemTransformer: '@App\VehicleApp\IdentityAccess\Main\Application\Transformer\Auth\AuthenticationItemTransformer'
+
+  App\VehicleApp\IdentityAccess\Main\Application\Command\Identity\RequestPasswordResetUserHandler:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Command\Identity\RequestPasswordResetUserHandler
+    arguments:
+      $userRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Identity\UserRepository'
+
+  App\VehicleApp\IdentityAccess\Main\Application\Command\Identity\PasswordResetUserHandler:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Command\Identity\PasswordResetUserHandler
+    arguments:
+      $userRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Identity\UserRepository'
+      $hasher: '@App\Common\Infrastructure\Service\Hasher\Hasher'
+
+  App\VehicleApp\IdentityAccess\Main\Application\Command\Identity\CreateUserHandler:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Command\Identity\CreateUserHandler
+    arguments:
+      $userRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Identity\UserRepository'
+      $roleRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Access\RoleRepository'
+      $hasher: '@App\Common\Infrastructure\Service\Hasher\Hasher'
+      $fileInspector: '@App\Common\Infrastructure\Service\FileInspector\UrlFileInspector'
+      $userValidator: '@App\VehicleApp\IdentityAccess\Main\Domain\Service\Identity\UserValidator'
+
+  App\VehicleApp\IdentityAccess\Main\Application\Command\Identity\UpdateUserHandler:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Command\Identity\UpdateUserHandler
+    arguments:
+      $userRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Identity\UserRepository'
+      $hasher: '@App\Common\Infrastructure\Service\Hasher\Hasher'
+      $fileInspector: '@App\Common\Infrastructure\Service\FileInspector\UrlFileInspector'
+      $userValidator: '@App\VehicleApp\IdentityAccess\Main\Domain\Service\Identity\UserValidator'
+
+  App\VehicleApp\IdentityAccess\Main\Application\Command\Identity\DestroyUserHandler:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Command\Identity\DestroyUserHandler
+    arguments:
+      $userRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Identity\UserRepository'
+      $userDestroyer: '@App\VehicleApp\IdentityAccess\Main\Domain\Service\Identity\UserDestroyer'
+
+  App\VehicleApp\IdentityAccess\Main\Application\Query\Identity\UserCollectionQueryHandler:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Query\Identity\UserCollectionQueryHandler
+    arguments:
+      $userRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Identity\UserRepository'
+      $collectionTransformer: '@App\VehicleApp\IdentityAccess\Main\Application\Transformer\Identity\UserCollectionTransformer'
+
+  App\VehicleApp\IdentityAccess\Main\Application\Query\Auth\MeQueryHandler:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Query\Auth\MeQueryHandler
+    arguments:
+      $userRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Identity\UserRepository'
+      $itemTransformer: '@App\VehicleApp\IdentityAccess\Main\Application\Transformer\Identity\UserItemTransformer'
+
+  App\VehicleApp\IdentityAccess\Main\Application\Command\Identity\UploadUserAvatarHandler:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Command\Identity\UploadUserAvatarHandler
+    arguments:
+      $fileUploader: '@app.common.infrastructure.service.fileUploader.flySystemLocalFileUploader'
+      $fileDestroyer: '@App\Common\Infrastructure\Service\FileDestroyer\FileDestroyer'
+      $itemTransformer: '@App\VehicleApp\IdentityAccess\Main\Application\Transformer\Identity\UserAvatarItemTransformer'
+
+  App\VehicleApp\IdentityAccess\Main\Application\Command\Access\CreateRoleHandler:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Command\Access\CreateRoleHandler
+    arguments:
+      $roleRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Access\RoleRepository'
+      $roleValidator: '@App\VehicleApp\IdentityAccess\Main\Domain\Service\Access\RoleValidator'
+
+  App\VehicleApp\IdentityAccess\Main\Application\Command\Access\UpdateRoleHandler:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Command\Access\UpdateRoleHandler
+    arguments:
+      $roleRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Access\RoleRepository'
+      $roleValidator: '@App\VehicleApp\IdentityAccess\Main\Domain\Service\Access\RoleValidator'
+
+  App\VehicleApp\IdentityAccess\Main\Application\Command\Access\DestroyRoleHandler:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Command\Access\DestroyRoleHandler
+    arguments:
+      $roleRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Access\RoleRepository'
+      $roleDestroyer: '@App\VehicleApp\IdentityAccess\Main\Domain\Service\Access\RoleDestroyer'
+
+  App\VehicleApp\IdentityAccess\Main\Application\Query\Access\RoleCollectionQueryHandler:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Query\Access\RoleCollectionQueryHandler
+    arguments:
+      $roleRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Access\RoleRepository'
+      $collectionTransformer: '@App\VehicleApp\IdentityAccess\Main\Application\Transformer\Access\RoleCollectionTransformer'
+
+  App\VehicleApp\IdentityAccess\Main\Application\Query\Access\UserRolesCollectionQueryHandler:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Query\Access\UserRolesCollectionQueryHandler
+    arguments:
+      $userRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Identity\UserRepository'
+      $roleRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Access\RoleRepository'
+      $collectionTransformer: '@App\VehicleApp\IdentityAccess\Main\Application\Transformer\Access\RoleCollectionTransformer'
+
+  App\VehicleApp\IdentityAccess\Main\Application\Command\Access\AttachRoleToUserHandler:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Command\Access\AttachRoleToUserHandler
+    arguments:
+      $userRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Identity\UserRepository'
+      $roleRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Access\RoleRepository'
+
+  App\VehicleApp\IdentityAccess\Main\Application\Command\Access\DetachRoleFromUserHandler:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Command\Access\DetachRoleFromUserHandler
+    arguments:
+      $userRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Identity\UserRepository'
+      $roleRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Access\RoleRepository'
+
+  App\VehicleApp\IdentityAccess\Main\Application\Command\Identity\SendPasswordResetEmailToUserHandler:
+    class: App\VehicleApp\IdentityAccess\Main\Application\Command\Identity\SendPasswordResetEmailToUserHandler
+    arguments:
+      $userRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Identity\UserRepository'
+      $itemTransformer: '@App\VehicleApp\IdentityAccess\Main\Application\Transformer\Identity\UserItemTransformer'
+      $serverConfiguration: '@App\Common\Infrastructure\Service\ServerConfiguration\ServerConfiguration'
+
+  # Event listener
+  App\VehicleApp\IdentityAccess\Main\Application\EventListener\Identity\UserEventListener:
+    class: App\VehicleApp\IdentityAccess\Main\Application\EventListener\Identity\UserEventListener
+    arguments:
+      $commandBus: '@App\Common\Application\Bus\CommandBus'
+    tags: [ 'messenger.message_handler' ]
+
+  # Fixture
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Auth\Fixtures\ClientFixtures:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Auth\Fixtures\ClientFixtures
+    arguments:
+      $clientRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Auth\ClientRepository'
+    tags: [ 'doctrine.fixture.orm' ]
+
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Access\Fixtures\RoleFixtures:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Access\Fixtures\RoleFixtures
+    arguments:
+      $roleRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Access\RoleRepository'
+    tags: [ 'doctrine.fixture.orm' ]
+
+  App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Identity\Fixtures\UserFixtures:
+    class: App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Identity\Fixtures\UserFixtures
+    arguments:
+      $userRepository: '@App\VehicleApp\IdentityAccess\Main\Domain\Model\Identity\UserRepository'
+      $hasher: '@App\Common\Infrastructure\Service\Hasher\Hasher'
+    tags: [ 'doctrine.fixture.orm' ]

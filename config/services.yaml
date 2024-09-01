@@ -1,0 +1,31 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+imports:
+    - { resource: 'parameters.yaml' }
+    - { resource: 'modules/services.yaml' }
+    - { resource: 'modules/EventStore/services.yaml' }
+    - { resource: 'modules/IdentityAccess/services.yaml' }
+    - { resource: 'modules/Vehicle/Brand/services.yaml' }
+    - { resource: 'modules/Vehicle/Type/services.yaml'}
+    - { resource: 'modules/Vehicle/Profil/Vehicle/services.yaml'}
+    - { resource: 'modules/Vehicle/Profil/Registration/services.yaml'}
+    - { resource: 'modules/Vehicle/Profil/Color/services.yaml'}
+    - { resource: 'modules/Vehicle/Profil/Image/services.yaml'}
+    - { resource: 'modules/Vehicle/Profil/UserVehicle/services.yaml'}
+    - { resource: 'modules/Vehicle/Profil/FuelAndExpense/services.yaml'}
+    - { resource: 'modules/Vehicle/Profil/FuelAndExpense/ExpenseType/services.yaml'}
+    - { resource: 'modules/Vehicle/Profil/Maintenance/MaintenanceType/services.yaml'}
+    - { resource: 'modules/Vehicle/Profil/Maintenance/services.yaml'}
+    - { resource: 'modules/Vehicle/Profil/PartAndService/services.yaml'}
+    - { resource: 'modules/Vehicle/Profil/DamageCoverage/services.yaml'}
+    - { resource: 'modules/Vehicle/Profil/Damage/services.yaml'}
+    - { resource: 'modules/Vehicle/Collaborator/CollabType/services.yaml'}
+    - { resource: 'modules/Vehicle/Collaborator/Client/services.yaml'}
+    - { resource: 'modules/Vehicle/Collaborator/Company/services.yaml'}
+    - { resource: 'modules/Vehicle/Collaborator/services.yaml'}
+    - { resource: 'modules/Vehicle/Profil/Vehicle/Documentation/services.yaml'}
+    - { resource: 'modules/Vehicle/Profil/Registration/Documentation/services.yaml'}
+    - { resource: 'modules/Vehicle/HistoryOfChange/services.yaml'}

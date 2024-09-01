@@ -1,0 +1,183 @@
+services:
+
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false
+
+  #Api Platform
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Profil\Vehicle\DataProvider:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataProvider\Profil\Vehicle\DataProvider
+    tags: [ 'api_platform.collection_data_provider', 'api_platform.item_data_provider' ]
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Profil\Vehicle\DataPersister:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\DataPersister\Profil\Vehicle\DataPersister
+    tags: [ 'api_platform.data_persister']
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Vehicle\Query\DoctrineVehicleCriteriaBuilder:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Vehicle\Query\DoctrineVehicleCriteriaBuilder
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Vehicle\UploadImage:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Vehicle\UploadImage
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Vehicle\UploadDocumentation:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Vehicle\UploadDocumentation
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Vehicle\AttachUser:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Vehicle\AttachUser
+
+  App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Vehicle\DetachUser:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Delivery\Symfony\ApiPlatform\Action\Vehicle\DetachUser
+  
+
+#Repository   
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Vehicle\DoctrineVehicleRepository:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Vehicle\DoctrineVehicleRepository
+    arguments:
+      $entityClass: 'App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\Vehicle'
+    calls:
+      - setCriteriaBuilder: ['@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Vehicle\Query\DoctrineVehicleCriteriaBuilder']
+  App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository: '@App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Vehicle\DoctrineVehicleRepository'
+
+  
+   
+   #Transformer
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Vehicle\VehicleItemTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Vehicle\VehicleItemTransformer
+  
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Vehicle\VehicleCollectionTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Vehicle\VehicleCollectionTransformer
+
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Vehicle\VehicleImageItemTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Vehicle\VehicleImageItemTransformer 
+
+  App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Vehicle\VehicleDocumentationItemTransformer:
+    class: App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Vehicle\VehicleDocumentationItemTransformer 
+
+
+  # Application Service
+  App\VehicleApp\Vehicle\Main\Application\Query\Profil\Vehicle\VehicleCollectionQueryHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Query\Profil\Vehicle\VehicleCollectionQueryHandler
+    arguments:
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+      $collectionTransformer: '@App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Vehicle\VehicleCollectionTransformer'
+
+  App\VehicleApp\Vehicles\Main\Application\Command\Profil\Vehicle\CreateVehicleHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Profil\Vehicle\CreateVehicleHandler
+    arguments:
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+      $typeRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Type\TypeRepository'
+      $vehicleValidator: '@App\VehicleApp\Vehicle\Main\Domain\Service\Validator\VehicleValidator'
+      $colorRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Color\ColorRepository'
+
+  App\VehicleApp\Vehicle\Main\Domain\Service\Profil\Vehicle\VehicleDestroyer:
+    class: App\VehicleApp\Vehicle\Main\Domain\Service\Profil\Vehicle\VehicleDestroyer
+    arguments:
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Vehicle\DestroyVehicleHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Profil\Vehicle\DestroyVehicleHandler
+    arguments:
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+      $vehicleDestroyer: '@App\VehicleApp\Vehicle\Main\Domain\Service\Profil\Vehicle\VehicleDestroyer'
+
+  App\VehicleApp\Vehicle\Main\Application\Query\Profil\Vehicle\VehicleRegistrationsCollectionQueryHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Query\Profil\Vehicle\VehicleRegistrationsQueryHandler
+    arguments:
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+      $registrationRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Registration\RegistrationRepository'
+      $collectionTransformer: '@App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Registration\RegistrationCollectionTransformer'
+
+  App\VehicleApp\Vehicle\Main\Application\Query\Profil\Vehicle\VehicleFuelAndExpenseQueryHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Query\Profil\Vehicle\VehicleFuelAndExpenseQueryHandler
+    arguments:
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+      $fuelAndExpenseRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\FuelAndExpense\FuelAndExpenseRepository'
+      $collectionTransformer: '@App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\FuelAndExpense\FuelAndExpenseCollectionTransformer'
+
+  App\VehicleApp\Vehicle\Main\Application\Query\Profil\Vehicle\VehicleMaintenanceCollectionQueryHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Query\Profil\Vehicle\VehicleMaintenanceCollectionQueryHandler
+    arguments:
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+      $maintenanceRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Maintenance\MaintenanceRepository'
+      $collectionTransformer: '@App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Maintenance\MaintenanceCollectionTransformer'
+
+  App\VehicleApp\Vehicle\Main\Application\Query\Profil\Vehicle\VehicleDamageQueryHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Query\Profil\Vehicle\VehicleDamageQueryHandler
+    arguments:
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+      $damageRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Damage\DamageRepository'
+      $collectionTransformer: '@App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Damage\DamageCollectionTransformer'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Vehicle\AttachUserToVehicleHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Profil\Vehicle\AttachUserToVehicleHandler
+    arguments:
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+      $userVehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\UserVehicle\UserVehicleRepository'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Vehicle\UpdateVehicleHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Profil\Vehicle\UpdateVehicleHandler
+    arguments:
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+      $colorRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Color\ColorRepository'
+
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Vehicle\DetachUserFromvehicleHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Profil\Vehicle\DetachUserFromvehicleHandler
+    arguments:
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+      $userVehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\UserVehicle\UserVehicleRepository'
+
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Vehicle\Image\UploadVehicleImageHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Profil\Vehicle\Image\UploadVehicleImageHandler
+    arguments:
+      $fileUploader: '@app.common.infrastructure.service.fileUploader.flySystemLocalFileUploader'
+      $fileDestroyer: '@App\Common\Infrastructure\Service\FileDestroyer\FileDestroyer'
+      $itemTransformer: '@App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Vehicle\VehicleImageItemTransformer'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Vehicle\UploadVehicleDocumentationHandler:
+    class:  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Vehicle\UploadVehicleDocumentationHandler
+    arguments:
+      $fileUploader: '@app.common.infrastructure.service.fileUploader.flySystemLocalFileUploader'
+      $fileDestroyer: '@App\Common\Infrastructure\Service\FileDestroyer\FileDestroyer'
+      $itemTransformer: '@App\VehicleApp\Vehicle\Main\Application\Transformer\Profil\Vehicle\VehicleDocumentationItemTransformer'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Vehicle\Image\CreateImageVehicleHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Profil\Vehicle\Image\CreateImageVehicleHandler
+    arguments:
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+      $fileInspector: '@App\Common\Infrastructure\Service\FileInspector\UrlFileInspector'
+
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Vehicle\Documentation\CreateDocumentationVehicleHandler:
+    class: App\VehicleApp\Vehicle\Main\Application\Command\Profil\Vehicle\Documentation\CreateDocumentationVehicleHandler
+    arguments:
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+      $fileInspector: '@App\Common\Infrastructure\Service\FileInspector\UrlFileInspector'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Vehicle\Image\DestroyVehicleImageHandler:
+    class:  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Vehicle\Image\DestroyVehicleImageHandler
+    arguments:
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+      $imageRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Image\ImageRepository'
+
+  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Vehicle\Documentation\DestroyVehicleDocumentationHandler:
+    class:  App\VehicleApp\Vehicle\Main\Application\Command\Profil\Vehicle\Documentation\DestroyVehicleDocumentationHandler
+    arguments:
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+
+  #Validator
+  App\VehicleApp\Vehicle\Main\Domain\Service\Validator\VehicleValidator: 
+    class: App\VehicleApp\Vehicle\Main\Domain\Service\Validator\VehicleValidator
+    arguments:
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+
+
+  #Fixture
+  App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Vehicle\Fixtures\VehicleFixtures:
+    class: App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Vehicle\Fixtures\VehicleFixtures
+    arguments:
+      $vehicleRepository: '@App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\VehicleRepository'
+    tags: [ 'doctrine.fixture.orm' ]

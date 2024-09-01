@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\VehicleApp\Vehicle\Main\Domain\Model\HistoryOfChange\HistoryOfChange" table="vehicles_history_of_changes" repository-class="App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\HistoryOfChange\DoctrineChangeRepository">
+        <id name="id" type="uuid" column="id">
+        </id>
+
+
+        <many-to-one field="user" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\UserVehicle\UserVehicle" inversed-by="historyOfChanges" />
+        <one-to-many field="changes" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\HistoryOfChange\Change\Change" mapped-by="historyOfChange" />
+    </entity>
+</doctrine-mapping>

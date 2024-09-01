@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\Vehicle" table="vehicles_vehicles" repository-class="App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Profil\Vehicle\DoctrineVehicleRepository">
+        <id name="id" type="uuid" column="id">
+            <generator strategy="NONE"/>
+        </id>
+        
+        <field name="price" type="integer" column="vehicle_price"/>
+        <field name="engineNumber" type="string" column="vehicle_engine_number"/>
+        <field name="chassisNumber" type="string" column="vehicle_chasiss_number"/>
+        <field name="yearOfProduction" type="string" column="vehicle_year_of_production"/>
+        <field name="vehicleActiveTo" type="datetime_immutable" column="vehicle_active_to" nullable="true"/>
+        <field name="vehicleActiveFrom" type="datetime_immutable" column="vehicle_active_from"/>
+    
+    
+        <field name="createdOn" type="datetime_immutable" column="created_on"/>
+        <field name="updatedOn" type="datetime_immutable" column="updated_on"/>
+
+        <many-to-one field="type" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\Type\Type">
+            <join-column name="type_id" referenced-column-name="id" />
+        </many-to-one>
+
+        <many-to-one field="color" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Color\Color" inversed-by="vehicles" />
+
+        <one-to-many field="damages" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Damage\Damage" mapped-by="vehicle" orphan-removal="true"/>
+
+        <one-to-many field="fuelAndExpenses" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\Profil\FuelAndExpense\FuelAndExpense" mapped-by="vehicle" orphan-removal="true"/>
+
+        <one-to-many field="registrations" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Registration\Registration" mapped-by="vehicle" orphan-removal="true"/>
+
+        <one-to-many field="maintenances" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Maintenance\Maintenance" mapped-by="vehicle" orphan-removal="true">
+
+        </one-to-many>
+
+        <one-to-many field="images" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Image\Image" mapped-by="vehicle" orphan-removal="true">
+            <cascade>
+                    <cascade-persist/>
+                    <cascade-remove/>
+            </cascade>
+        </one-to-many>
+
+        <one-to-many field="documentations" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\Profil\Vehicle\Documentation\VehicleDocumentation" mapped-by="vehicle"  orphan-removal="true">
+            <cascade>
+                    <cascade-persist/>
+                    <cascade-remove/>
+            </cascade>
+         </one-to-many>
+
+
+         <many-to-many field="users" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\UserVehicle\UserVehicle" inversed-by="vehicles" fetch="EXTRA_LAZY">
+            <join-table name="vehicles_vehicles_users">
+                <join-columns>
+                    <join-column name="vehicle_id" referenced-column-name="id"/>
+                </join-columns>
+                <inverse-join-columns>
+                    <join-column name="user_id" referenced-column-name="id"/>
+                </inverse-join-columns>
+            </join-table>
+        </many-to-many>
+
+
+    </entity>
+</doctrine-mapping>

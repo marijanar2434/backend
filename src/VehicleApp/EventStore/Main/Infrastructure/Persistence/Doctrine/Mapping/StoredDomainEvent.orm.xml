@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\VehicleApp\EventStore\Main\Domain\Event\StoredDomainEvent" table="event_store" repository-class="App\VehicleApp\EventStore\Main\Infrastructure\Persistence\Doctrine\DoctrineEventStoreRepository">
+        <id name="id" type="integer" column="id">
+            <generator strategy="AUTO"/>
+        </id>
+        <field name="entityId" type="uuid" column="entity_id"/>
+        <field name="domainEventType" type="string" column="type" length="255"/>
+        <field name="domainEventVersion" type="integer" column="version"/>
+        <field name="body" type="text" column="body"/>
+        <field name="occurredOn" type="datetime_immutable" column="occurred_on"/>
+    </entity>
+</doctrine-mapping>

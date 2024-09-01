@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\VehicleApp\IdentityAccess\Main\Domain\Model\Identity\User" table="identity_access_users" repository-class="App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Identity\DoctrineUserRepository">
+        <id name="id" type="uuid" column="id">
+            <generator strategy="NONE"/>
+        </id>
+        <indexes>
+            <index columns="username"/>
+            <index columns="email"/>
+        </indexes>
+        <field name="fullName" type="string" column="full_name" length="250"/>
+        <field name="username" type="string" column="username" length="255" unique="true"/>
+        <field name="email" type="string" column="email" length="255" unique="true"/>
+        <field name="password" type="text" column="password"/>
+        <field name="active" type="boolean" column="active"/>
+        <field name="createdOn" type="datetime_immutable" column="created_on"/>
+        <field name="updatedOn" type="datetime_immutable" column="updated_on"/>
+
+        <embedded name="avatar" class="App\Common\Domain\ValueObject\File"/>
+        <embedded name="passwordResetRequest" class="App\VehicleApp\IdentityAccess\Main\Domain\Model\Identity\PasswordResetRequest"/>
+
+        <many-to-many field="roles" target-entity="App\VehicleApp\IdentityAccess\Main\Domain\Model\Access\Role" inversed-by="users" fetch="EXTRA_LAZY">
+            <join-table name="identity_access_users_roles">
+                <join-columns>
+                    <join-column name="user_id" referenced-column-name="id"/>
+                </join-columns>
+                <inverse-join-columns>
+                    <join-column name="role_id" referenced-column-name="id"/>
+                </inverse-join-columns>
+            </join-table>
+        </many-to-many>
+    </entity>
+</doctrine-mapping>

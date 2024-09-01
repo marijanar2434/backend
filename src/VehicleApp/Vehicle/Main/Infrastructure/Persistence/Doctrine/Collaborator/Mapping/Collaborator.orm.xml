@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\Collaborator" table="vehicles_collaborators" repository-class="App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Collaborator\DoctrineCollaboratorRepository">
+        <id name="id" type="uuid" column="id">
+            <generator strategy="NONE"/>
+        </id>
+        
+
+
+
+        <many-to-one field="client" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\Client\Client" mapped-by="collaborators" />
+  
+        <many-to-one field="company" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\Company\Company" mapped-by="collaborators" />
+  
+
+        <many-to-many field="types" target-entity="App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\CollabType\CollabType" inversed-by="collaborators" fetch="EXTRA_LAZY">
+            <join-table name="vehicles_collaborators_types">
+                <join-columns>
+                    <join-column name="collaborator_id" referenced-column-name="id"/>
+                </join-columns>
+                <inverse-join-columns>
+                    <join-column name="type_id" referenced-column-name="id"/>
+                </inverse-join-columns>
+            </join-table>
+        </many-to-many>
+    </entity>
+</doctrine-mapping>

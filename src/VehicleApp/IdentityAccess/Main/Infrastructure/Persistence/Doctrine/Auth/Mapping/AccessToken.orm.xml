@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\VehicleApp\IdentityAccess\Main\Domain\Model\Auth\AccessToken" table="identity_access_access_tokens" repository-class="App\VehicleApp\IdentityAccess\Main\Infrastructure\Persistence\Doctrine\Auth\DoctrineAccessTokenRepository">
+        <id name="id" type="uuid" column="id">
+            <generator strategy="NONE"/>
+        </id>
+        <field name="identifier" type="string" column="identifier" length="255"/>
+        <field name="userId" type="uuid" column="user_id"/>
+        <field name="clientId" type="uuid" column="client_id"/>
+        <field name="scopes" type="array" column="scopes" nullable="true"/>
+        <field name="revoked" type="boolean" column="revoked"/>
+        <field name="createdOn" type="datetime_immutable" column="created_on"/>
+        <field name="updatedOn" type="datetime_immutable" column="updated_on"/>
+        <field name="expiresOn" type="datetime_immutable" column="expires_on"/>
+    </entity>
+</doctrine-mapping>

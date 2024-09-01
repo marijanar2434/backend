@@ -1,0 +1,5 @@
+.git/
+.vscode/
+vendor/
+var/cache/
+var/log/

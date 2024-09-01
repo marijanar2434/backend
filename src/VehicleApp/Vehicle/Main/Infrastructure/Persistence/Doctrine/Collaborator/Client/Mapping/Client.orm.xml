@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\VehicleApp\Vehicle\Main\Domain\Model\Collaborator\Client\Client" table="vehicles_clients" repository-class="App\VehicleApp\Vehicle\Main\Infrastructure\Persistence\Doctrine\Collaborator\Client\DoctrineClientRepository">
+        <id name="id" type="uuid" column="id">
+            <generator strategy="NONE"/>
+        </id>
+
+
+        <field name="fullname" type="string" column="vehicle_client_fullname"/>
+        <field name="address" type="string" column="vehicle_client_address"/>
+        <field name="email" type="string" column="vehicle_client_email"/>
+        <field name="phoneNumber" type="string" column="vehicle_client_phone_number"/>
+        <field name="website" type="string" column="vehicle_client_webiste"/>
+    
+
+        <field name="createdOn" type="datetime_immutable" column="created_on"/>
+        <field name="updatedOn" type="datetime_immutable" column="updated_on"/>
+
+         
+       
+    </entity>
+</doctrine-mapping>
