@@ -66,7 +66,7 @@ class Brand
     #[Assert\NotBlank(groups: ['create', 'update'])]
     #[Assert\Type('string', groups: ['create', 'update'])]
     #[Assert\Length(
-        min: 2,
+        min: 8,
         max: 200,
         minMessage: 'Please enter at least {{ limit }} characters.',
         maxMessage: 'Cannot be longer than {{ limit }} characters.',
