@@ -327,9 +327,9 @@ class Vehicle
 
     #[Assert\Type('string', groups: ['create', 'update'])]
     #[Assert\Length(
-        min: 2,
+        min: 8,
         max: 200,
-        minMessage: 'Please enter at least {{ limit }} characters.',
+        minMessage: 'Molimo vas unesite najmanje {{ limit }} karaktera.',
         maxMessage: 'Cannot be longer than {{ limit }} characters.',
         groups: ['create', 'update']
     )]
